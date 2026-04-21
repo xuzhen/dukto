@@ -22,9 +22,12 @@
 #include "miniwebserver.h"
 #include "duktowindow.h"
 #include "platform.h"
-#include "updateschecker.h"
 #include "systemtray.h"
 #include "version.h"
+
+#ifdef UPDATER
+#include "updateschecker.h"
+#endif
 
 #ifdef Q_OS_ANDROID
 #include "androidutils.h"
@@ -43,6 +46,7 @@
 #include <QMessageBox>
 #include <QImage>
 #include <QStandardPaths>
+#include <QThread>
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10 ,0)
 #include <QRandomGenerator>
@@ -120,12 +124,12 @@ GuiBehind::GuiBehind() : QObject(nullptr)
     mShowBackTimer->start(10000);
 
 #ifdef UPDATER
-    // Enqueue check for updates
-    mUpdatesChecker = new UpdatesChecker();
-    connect(mUpdatesChecker, &UpdatesChecker::updatesAvailable, this, &GuiBehind::showUpdatesMessage);
-    QTimer::singleShot(2000, [this]()->void {
-        mUpdatesChecker->start();
-    });
+    if (gSettings->autoCheckUpdate()) {
+        QDate date = gSettings->checkDate();
+        if (!date.isValid() || date.addDays(7) < QDate::currentDate()) {
+            checkUpdate();
+        }
+    }
 #endif
 
     qRegisterMetaType<QMargins>("QMargins");
@@ -133,9 +137,6 @@ GuiBehind::GuiBehind() : QObject(nullptr)
 
 GuiBehind::~GuiBehind()
 {
-#ifdef UPDATER
-    if (mUpdatesChecker) mUpdatesChecker->deleteLater();
-#endif
     if (mMiniWebServer) mMiniWebServer->deleteLater();
     if (mShowBackTimer) mShowBackTimer->deleteLater();
     if (mPeriodicHelloTimer) mPeriodicHelloTimer->deleteLater();
@@ -144,6 +145,7 @@ GuiBehind::~GuiBehind()
 
 void GuiBehind::setViewer(DuktoWindow *view, SystemTray *tray) {
     mView = view;
+    mTray = tray;
 
     // Init buddy list
     view->rootContext()->setContextProperty("buddiesListData", &mBuddiesList);
@@ -721,9 +723,10 @@ void GuiBehind::discoveryNeighbors()
 }
 
 // Show updates message
-void GuiBehind::showUpdatesMessage()
+void GuiBehind::showUpdatesMessage(const QString &version)
 {
     setShowUpdateBanner(true);
+    setLatestVersion(version);
 }
 
 // Abort current transfer while sending data
@@ -936,6 +939,15 @@ void GuiBehind::setShowUpdateBanner(bool show)
     emit showUpdateBannerChanged();
 }
 
+QString GuiBehind::latestVersion() {
+    return mLatestVersion;
+}
+
+void GuiBehind::setLatestVersion(const QString &version) {
+    mLatestVersion = version;
+    emit latestVersionChanged();
+}
+
 void GuiBehind::setBuddyName(const QString &name)
 {
     gSettings->saveBuddyName(QString(name).replace(' ', ""));
@@ -1009,6 +1021,15 @@ bool GuiBehind::darkMode() {
     return gSettings->darkMode();
 }
 
+void GuiBehind::setAutoCheck(bool enabled) {
+    gSettings->saveAutoCheckUpdate(enabled);
+    emit autoCheckChanged();
+}
+
+bool GuiBehind::autoCheck() {
+    return gSettings->autoCheckUpdate();
+}
+
 void GuiBehind::setInitError(const QString &error, const QString &action) {
     if (error != mInitError) {
         mInitError = error;
@@ -1047,6 +1068,14 @@ QMargins GuiBehind::screenPadding() {
 
 bool GuiBehind::isDesktopApp() {
 #ifdef DESKTOP_APP
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool GuiBehind::hasUpdater() {
+#ifdef UPDATER
     return true;
 #else
     return false;
@@ -1209,3 +1238,21 @@ void GuiBehind::setThemeMode(bool darkMode) {
     Platform::setNonClientAreaMode(nullptr, darkMode);
 #endif
 }
+
+#ifdef UPDATER
+void GuiBehind::checkUpdate() {
+    // Enqueue check for updates
+    QThread *checkerThread = new QThread();
+    UpdatesChecker *checker = new UpdatesChecker();
+    checker->moveToThread(checkerThread);
+    connect(checkerThread, &QThread::started, checker, &UpdatesChecker::check);
+    connect(checker, &UpdatesChecker::checkEnd, checker, &UpdatesChecker::deleteLater);
+    connect(checker, &UpdatesChecker::checkEnd, this, [](bool success){ if (success) { gSettings->saveCheckDate(); } });
+    connect(checker, &UpdatesChecker::destroyed, checkerThread, &QThread::quit);
+    connect(checkerThread, &QThread::finished, checkerThread, &QThread::deleteLater);
+    connect(checker, &UpdatesChecker::updatesAvailable, this, &GuiBehind::showUpdatesMessage, Qt::QueuedConnection);
+    QTimer::singleShot(2000, [checkerThread](){
+        checkerThread->start();
+    });
+}
+#endif

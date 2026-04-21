@@ -42,12 +42,12 @@ Item {
             anchors.margins: 10
             font.pixelSize: 14
             wrapMode: Text.WordWrap
-            text: "A new release is available, click here to download it!"
+            text: "New version " + guiBehind.latestVersion + " is available, click here to download it!"
         }
 
         MouseArea {
             anchors.fill: parent
-            onClicked: Qt.openUrlExternally("https://www.msec.it/blog/dukto/")
+            onClicked: Qt.openUrlExternally("https://github.com/xuzhen/dukto-qt5/releases/v" + guiBehind.latestVersion)
         }
 
         Behavior on x { NumberAnimation { duration: 500; easing.type: "OutCubic" } }

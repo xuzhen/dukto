@@ -145,3 +145,21 @@ void Settings::saveCloseToTrayEnabled(bool enabled) {
     mSettings.setValue("CloseToTray", enabled);
     mSettings.sync();
 }
+
+bool Settings::autoCheckUpdate() {
+    return mSettings.value("CheckUpdate", true).toBool();
+}
+
+void Settings::saveAutoCheckUpdate(bool enabled) {
+    mSettings.setValue("CheckUpdate", enabled);
+    mSettings.sync();
+}
+
+QDate Settings::checkDate() {
+    return mSettings.value("CheckDate", QDate()).toDate();
+}
+
+void Settings::saveCheckDate() {
+    mSettings.setValue("CheckDate", QDate::currentDate());
+    mSettings.sync();
+}

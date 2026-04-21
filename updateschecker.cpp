@@ -19,55 +19,63 @@
 #ifdef UPDATER
 #include "updateschecker.h"
 
-#include "platform.h"
-
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
-#include <QSysInfo>
-#include <QLocale>
+#include <QJsonDocument>
+#include <QJsonObject>
 
-UpdatesChecker::UpdatesChecker(QObject *parent) :
-    QThread(parent)
+#include "version.h"
+
+UpdatesChecker::UpdatesChecker(QObject *parent) : QObject(parent)
 {
 }
 
-UpdatesChecker::~UpdatesChecker()
+void UpdatesChecker::check()
 {
-    delete mNetworkAccessManager;
-}
-
-void UpdatesChecker::run()
-{
-    // Get platform data
-    QString osver;
-    QString os = Platform::getPlatformName().toLower();
-#if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
-    osver = QSysInfo::kernelVersion();
-#else
-#if defined(Q_OS_WIN)
-    osver = QString::number(QSysInfo::WindowsVersion);
-#elif defined(Q_OS_MAC)
-    osver = QString::number(QSysInfo::MacintoshVersion);
-#endif
-#endif
-    QString ver = "6.0";
-    QString locale = QLocale::system().name();
+    //emit updatesAvailable("6.9.9");
+    //emit checkEnd(true);
 
     // Send check request
-    QNetworkRequest request(QUrl("https://www.msec.it/blog/dukto/r5check.php?ver=" + ver + "&locale=" + locale + "&os=" + os + "&osver=" + osver));
-    mNetworkAccessManager = new QNetworkAccessManager();
-    connect(mNetworkAccessManager, &QNetworkAccessManager::finished, this, &UpdatesChecker::updatedDataReady);
-    mNetworkAccessManager->get(request);
-
-    exec();
+    QNetworkRequest request(QUrl("https://api.github.com/repos/xuzhen/dukto-qt5/releases/latest"));
+    request.setRawHeader("Accept", "application/vnd.github+json");
+    QNetworkAccessManager *nam = new QNetworkAccessManager();
+    connect(nam, &QNetworkAccessManager::finished, this, &UpdatesChecker::updatedDataReady);
+    connect(this, &UpdatesChecker::checkEnd, nam, &QNetworkAccessManager::deleteLater);
+    nam->get(request);
 }
 
-// Read updates results
+// Read release results
 void UpdatesChecker::updatedDataReady(QNetworkReply *reply)
 {
-    if (reply->error() != QNetworkReply::NoError) return;
-    if (QString(reply->readAll()).isEmpty()) return;
-    emit updatesAvailable();
+    bool success = false;
+    if (reply->error() == QNetworkReply::NoError) {
+        QByteArray data = reply->readAll();
+        QJsonParseError error;
+        QJsonDocument release = QJsonDocument::fromJson(data, &error);
+        if (error.error == QJsonParseError::NoError && release.isObject()) {
+            QString tag = release.object().value("tag_name").toString();
+            if (!tag.isEmpty()) {
+                const QStringList list = tag.remove(QChar('v')).split(QChar('.'));
+                QList<uint> ver;
+                for (const QString &s : list) {
+                    bool ok;
+                    ver.append(s.toUInt(&ok));
+                    if (!ok) {
+                        break;
+                    }
+                }
+                while (ver.size() < 3) {
+                    ver.append(0);
+                }
+                if (ver[0] > VERSION_MAJOR || (ver[0] == VERSION_MAJOR && (ver[1] > VERSION_MINOR || (ver[1] == VERSION_MINOR && ver[2] > VERSION_PATCH)))) {
+                    emit updatesAvailable(tag);
+                }
+                success = true;
+            }
+        }
+    }
+    emit checkEnd(success);
+    reply->manager()->deleteLater();
 }
 #endif

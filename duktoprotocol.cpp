@@ -47,7 +47,6 @@ enum MSG_TYPE {
 DuktoProtocol::DuktoProtocol(QObject *parent)
     : QObject(parent), mLocalTcpPort(DEFAULT_TCP_PORT)
 {
-    QNetworkProxy::setApplicationProxy(QNetworkProxy(QNetworkProxy::NoProxy));
 }
 
 DuktoProtocol::~DuktoProtocol()
@@ -74,6 +73,7 @@ bool DuktoProtocol::setupTcpServer(quint16 port, QString &error)
 {
     if (mTcpServer == nullptr) {
         mTcpServer = new QTcpServer(this);
+        mTcpServer->setProxy(QNetworkProxy::NoProxy);
     }
     if (mLocalTcpPort != port && mTcpServer->isListening()) {
         mLocalTcpPort = port;

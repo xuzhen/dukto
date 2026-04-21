@@ -48,6 +48,10 @@ public:
     void saveNotificationEnabled(bool enabled);
     bool closeToTrayEnabled();
     void saveCloseToTrayEnabled(bool enabled);
+    bool autoCheckUpdate();
+    void saveAutoCheckUpdate(bool enabled);
+    QDate checkDate();
+    void saveCheckDate();
 
 private:
     explicit Settings(QObject *parent = nullptr);

@@ -18,12 +18,14 @@
 
 #include "sender.h"
 #include <QTcpSocket>
+#include <QNetworkProxy>
 #include <QTimer>
 
 QByteArray Sender::textElementName = QStringLiteral("___DUKTO___TEXT___").toUtf8();
 
 
 Sender::Sender(const QString &dest, quint16 port, QObject *parent) : QObject(parent), socket(new QTcpSocket()), dest(dest), port(port) {
+    socket->setProxy(QNetworkProxy::NoProxy);
     connect(socket, &QTcpSocket::connected, this, &Sender::sendData);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     connect(socket, &QTcpSocket::errorOccurred, this, &Sender::connectionError);

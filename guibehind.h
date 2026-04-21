@@ -28,9 +28,6 @@
 #include "duktoprotocol.h"
 #include "theme.h"
 
-#ifdef UPDATER
-class UpdatesChecker;
-#endif
 class MiniWebServer;
 class DuktoWindow;
 class SystemTray;
@@ -55,12 +52,14 @@ class GuiBehind : public QObject
     Q_PROPERTY(QString messagePageBackState READ messagePageBackState WRITE setMessagePageBackState NOTIFY messagePageBackStateChanged)
     Q_PROPERTY(bool showTermsOnStart READ showTermsOnStart WRITE setShowTermsOnStart NOTIFY showTermsOnStartChanged)
     Q_PROPERTY(bool showUpdateBanner READ showUpdateBanner WRITE setShowUpdateBanner NOTIFY showUpdateBannerChanged)
+    Q_PROPERTY(QString latestVersion READ latestVersion NOTIFY latestVersionChanged)
     Q_PROPERTY(QString buddyName READ buddyName WRITE setBuddyName NOTIFY buddyNameChanged)
     Q_PROPERTY(QString buddyAvatar READ buddyAvatar NOTIFY buddyAvatarChanged)
     Q_PROPERTY(bool showNotification READ showNotification WRITE setShowNotification NOTIFY showNotificationChanged)
     Q_PROPERTY(bool closeToTray READ closeToTray WRITE setCloseToTray NOTIFY closeToTrayChanged)
     Q_PROPERTY(bool autoMode READ autoMode WRITE setAutoMode NOTIFY autoModeChanged)
     Q_PROPERTY(bool darkMode READ darkMode WRITE setDarkMode NOTIFY darkModeChanged)
+    Q_PROPERTY(bool autoCheck READ autoCheck WRITE setAutoCheck NOTIFY autoCheckChanged)
     Q_PROPERTY(QString initError READ initError NOTIFY initErrorChanged)
     Q_PROPERTY(QString initErrorAction READ initErrorAction NOTIFY initErrorActionChanged)
     Q_PROPERTY(QMargins screenPadding READ screenPadding NOTIFY screenPaddingChanged)
@@ -107,6 +106,8 @@ public:
     void setShowTermsOnStart(bool show);
     bool showUpdateBanner();
     void setShowUpdateBanner(bool show);
+    QString latestVersion();
+    void setLatestVersion(const QString &version);
     void setBuddyName(const QString &name);
     QString buddyName();
     QString buddyAvatar();
@@ -118,6 +119,8 @@ public:
     bool autoMode();
     void setDarkMode(bool darkMode);
     bool darkMode();
+    void setAutoCheck(bool enabled);
+    bool autoCheck();
     void setInitError(const QString &error, const QString &action = "Retry");
     QString initError();
     QString initErrorAction();
@@ -144,12 +147,14 @@ Q_SIGNALS:
     void messagePageBackStateChanged();
     void showTermsOnStartChanged();
     void showUpdateBannerChanged();
+    void latestVersionChanged();
     void buddyNameChanged();
     void buddyAvatarChanged();
     void showNotificationChanged();
     void closeToTrayChanged();
     void autoModeChanged();
     void darkModeChanged();
+    void autoCheckChanged();
     void initErrorChanged();
     void initErrorActionChanged();
     void screenPaddingChanged();
@@ -199,6 +204,7 @@ public Q_SLOTS:
     void resetProgressStatus();
     void abortTransfer();
     bool isDesktopApp();
+    bool hasUpdater();
     void initialize();
     void reinitialize(const QString &action);
     void refreshNeighbors();
@@ -212,12 +218,13 @@ private Q_SLOTS:
     void showRandomBack();
     void clipboardChanged();
     void remoteDestinationAddressHandler();
-    void showUpdatesMessage();
+    void showUpdatesMessage(const QString &version);
     void sendScreenStage2();
     void discoveryNeighbors();
 
 private:
     DuktoWindow *mView = nullptr;
+    SystemTray *mTray = nullptr;
     QTimer *mShowBackTimer = nullptr;
     QTimer *mPeriodicHelloTimer = nullptr;
     MiniWebServer *mMiniWebServer = nullptr;
@@ -227,9 +234,6 @@ private:
     IpAddressItemModel mIpAddresses;
     DuktoProtocol mDuktoProtocol;
     Theme mTheme;
-#ifdef UPDATER
-    UpdatesChecker *mUpdatesChecker;
-#endif
 
     int mCurrentTransferProgress;
     QString mCurrentTransferBuddy;
@@ -246,6 +250,7 @@ private:
     QString mMessagePageTitle;
     QString mMessagePageBackState;
     bool mShowUpdateBanner;
+    QString mLatestVersion;
     QString mScreenTempPath;
     QString mInitError;
     QString mInitErrorAction;
@@ -257,6 +262,9 @@ private:
     void startTransfer(const QStringList &files);
     void startTransfer(const QString &text);
     void setThemeMode(bool darkMode);
+#ifdef UPDATER
+    void checkUpdate();
+#endif
 };
 
 #endif // GUIBEHIND_H

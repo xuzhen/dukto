@@ -16,30 +16,30 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#if defined(UPDATER) && !defined(UPDATESCHECKER_H)
+#ifndef UPDATESCHECKER_H
 #define UPDATESCHECKER_H
 
-#include <QThread>
+#ifdef UPDATER
 
-class QNetworkAccessManager;
+#include <QObject>
+
 class QNetworkReply;
 
-class UpdatesChecker : public QThread
+class UpdatesChecker : public QObject
 {
     Q_OBJECT
 public:
     explicit UpdatesChecker(QObject *parent = nullptr);
-    virtual ~UpdatesChecker();
-    void run();
+    void check();
 
 Q_SIGNALS:
-    void updatesAvailable();
+    void updatesAvailable(QString version);
+    void checkEnd(bool success);
 
 private Q_SLOTS:
     void updatedDataReady(QNetworkReply *reply);
-
-private:
-    QNetworkAccessManager *mNetworkAccessManager = nullptr;
 };
+
+#endif
 
 #endif

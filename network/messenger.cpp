@@ -20,6 +20,7 @@
 
 #include <QUdpSocket>
 #include <QNetworkInterface>
+#include <QNetworkProxy>
 #include <QDebug>
 
 #include "platform.h"
@@ -31,6 +32,7 @@
 
 Messenger::Messenger(quint16 defaultPort, QObject *parent) : QObject(parent), protocolDefaultPort(defaultPort) {
     socket = new QUdpSocket(this);
+    socket->setProxy(QNetworkProxy::NoProxy);
 }
 
 Messenger::~Messenger() {

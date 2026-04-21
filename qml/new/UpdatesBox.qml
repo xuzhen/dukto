@@ -21,7 +21,6 @@ import QtQuick 2.14
 Item {
     id: box
     width: 190
-    height: 55
     clip: true
     state: guiBehind.showUpdateBanner ? "showed" : "hidden"
 
@@ -42,14 +41,14 @@ Item {
             anchors.margins: 10
             font.pixelSize: 14
             wrapMode: Text.WordWrap
-            text: "A new release is available, click here to download it!"
+            text: "New version " + guiBehind.latestVersion + " is available, click here to download it!"
         }
 
         MouseArea {
             anchors.fill: parent
             Connections {
                 function onClicked() {
-                    Qt.openUrlExternally("https://www.msec.it/blog/dukto/")
+                    Qt.openUrlExternally("https://github.com/xuzhen/dukto-qt5/releases/v" + guiBehind.latestVersion)
                 }
             }
         }

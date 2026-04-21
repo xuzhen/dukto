@@ -19,7 +19,7 @@
 import QtQuick 2.3
 
 Flickable {
-    property var lastItem: (guiBehind.isDesktopApp() ? cswitch : modeSwitch)
+    property var lastItem: uswitch
 
     id: settingsPage
     interactive: (lastItem.y + lastItem.height + 20) > height
@@ -30,7 +30,6 @@ Flickable {
     signal back()
 
     function refreshColor() {
-
         picker.setColor(theme.themeColor);
     }
 
@@ -274,6 +273,17 @@ Flickable {
             text: "Minimize to system tray on close"
             checked: guiBehind.closeToTray
             onClicked: guiBehind.closeToTray = checked
+        }
+
+        CheckBox {
+            id: uswitch
+            visible: guiBehind.hasUpdater()
+            anchors.top: cswitch.bottom
+            anchors.left: labelPath.left
+            anchors.topMargin: 15
+            text: "Check update weekly"
+            checked: guiBehind.autoCheck
+            onClicked: guiBehind.autoCheck = checked
         }
     }
 }

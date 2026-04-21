@@ -4,8 +4,7 @@ If (APPLE)
 endif()
 project(dukto)
 
-#FIXME: updater no longer works
-#OPTION(USE_UPDATER "Add updater for application" OFF)
+OPTION(USE_UPDATER "Check application updates" OFF)
 OPTION(USE_SINGLE_APP "Allow only one instance" OFF)
 OPTION(USE_NOTIFY_LIBNOTIFY "Use libnotify for notifications (Linux only)" OFF)
 

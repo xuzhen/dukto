@@ -12,8 +12,8 @@ greaterThan(QT_MAJOR_VERSION, 5) {
 # Allow only one instance
 DEFINES += SINGLE_APP
 
-# FIXME: Updater no longer works
-#DEFINES += UPDATER
+# Check updates
+DEFINES += UPDATER
 
 # Use libnotify for notifications (Linux only)
 #DEFINES += NOTIFY_LIBNOTIFY
