@@ -8,9 +8,6 @@ OPTION(USE_UPDATER "Check application updates" OFF)
 OPTION(USE_SINGLE_APP "Allow only one instance" OFF)
 OPTION(USE_NOTIFY_LIBNOTIFY "Use libnotify for notifications (Linux only)" OFF)
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
@@ -55,6 +52,13 @@ elseif(NOT QT_MAJOR_VERSION)
         set(QT_MAJOR_VERSION 6)
     endif()
 endif(QT_CMAKE_ROOT)
+
+if(QT_MAJOR_VERSION EQUAL 5)
+    set(CMAKE_CXX_STANDARD 11)
+else()
+    set(CMAKE_CXX_STANDARD 17)
+endif()
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(QT_COMPONENTS Core Gui Network Qml QuickWidgets)
 if(UNIX AND NOT APPLE AND NOT ANDROID)
