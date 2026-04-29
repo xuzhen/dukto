@@ -341,7 +341,7 @@ Flickable {
             anchors.top: cswitch.bottom
             anchors.left: labelPath.left
             anchors.topMargin: 15
-            text: "Check update weekly"
+            text: "Check for updates"
             checked: guiBehind.autoCheck
 
             Connections {

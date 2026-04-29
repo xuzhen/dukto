@@ -47,6 +47,7 @@
 #include <QImage>
 #include <QStandardPaths>
 #include <QThread>
+#include <QDate>
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10 ,0)
 #include <QRandomGenerator>
@@ -124,11 +125,8 @@ GuiBehind::GuiBehind() : QObject(nullptr)
     mShowBackTimer->start(10000);
 
 #ifdef UPDATER
-    if (gSettings->autoCheckUpdate()) {
-        QDate date = gSettings->checkDate();
-        if (!date.isValid() || date.addDays(7) < QDate::currentDate()) {
-            checkUpdate();
-        }
+    if (gSettings->autoCheckUpdates()) {
+        checkUpdates(false);
     }
 #endif
 
@@ -1021,14 +1019,19 @@ bool GuiBehind::darkMode() {
     return gSettings->darkMode();
 }
 
+#ifdef UPDATER
 void GuiBehind::setAutoCheck(bool enabled) {
-    gSettings->saveAutoCheckUpdate(enabled);
+    gSettings->saveAutoCheckUpdates(enabled);
     emit autoCheckChanged();
+    if (enabled) {
+        checkUpdates(true);
+    }
 }
 
 bool GuiBehind::autoCheck() {
-    return gSettings->autoCheckUpdate();
+    return gSettings->autoCheckUpdates();
 }
+#endif
 
 void GuiBehind::setInitError(const QString &error, const QString &action) {
     if (error != mInitError) {
@@ -1240,7 +1243,13 @@ void GuiBehind::setThemeMode(bool darkMode) {
 }
 
 #ifdef UPDATER
-void GuiBehind::checkUpdate() {
+void GuiBehind::checkUpdates(bool forceCheck) {
+    if (forceCheck == false) {
+        QDate date = gSettings->checkDate();
+        if (date.isValid() && date.addDays(7) > QDate::currentDate()) {
+            return;
+        }
+    }
     // Enqueue check for updates
     QThread *checkerThread = new QThread();
     UpdatesChecker *checker = new UpdatesChecker();
@@ -1251,8 +1260,12 @@ void GuiBehind::checkUpdate() {
     connect(checker, &UpdatesChecker::destroyed, checkerThread, &QThread::quit);
     connect(checkerThread, &QThread::finished, checkerThread, &QThread::deleteLater);
     connect(checker, &UpdatesChecker::updatesAvailable, this, &GuiBehind::showUpdatesMessage, Qt::QueuedConnection);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
     QTimer::singleShot(2000, [checkerThread](){
         checkerThread->start();
     });
+#else
+    QTimer::singleShot(2000, checkerThread, SLOT(start()));
+#endif
 }
 #endif

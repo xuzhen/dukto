@@ -20,16 +20,18 @@ import QtQuick 2.3
 
 Item {
     id: box
-    width: 190
-    height: 55
+    width: parent.width * 0.7
+    implicitHeight: backRecangle.height
     clip: true
     state: guiBehind.showUpdateBanner ? "showed" : "hidden"
+    visible: guiBehind.latestVersion !== ""
 
     Rectangle {
         id: backRecangle
         color: theme.themeColor
-        height: parent.height
         width: parent.width
+        anchors.top: parent.top
+        implicitHeight: labelText.implicitHeight + labelText.anchors.topMargin + labelText.anchors.bottomMargin + progressBar.height
 
         Image {
             anchors.fill: parent
@@ -47,29 +49,64 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            onClicked: Qt.openUrlExternally("https://github.com/xuzhen/dukto-qt5/releases/v" + guiBehind.latestVersion)
+            onClicked: {
+                Qt.openUrlExternally("https://github.com/xuzhen/dukto/releases/v" + guiBehind.latestVersion)
+                timer.triggered()
+            }
         }
 
-        Behavior on x { NumberAnimation { duration: 500; easing.type: "OutCubic" } }
+        Rectangle {
+            id: progressBar
+            width: parent.width
+            height: 4
+            anchors.bottom: parent.bottom
+            color: theme.themeLighterColor
+
+            Behavior on x { NumberAnimation { duration: timer.interval } }
+        }
+
+        Behavior on x { NumberAnimation { duration: 1000; easing.type: "OutCubic" } }
     }
+
+    Timer {
+        id: timer
+        interval: 15000
+        running: false
+        repeat: false
+        onTriggered: guiBehind.showUpdateBanner = false
+    }
+
     states: [
         State {
             name: "hidden"
-
             PropertyChanges {
                 target: backRecangle
                 x: box.width
             }
+            PropertyChanges {
+                target: timer
+                running: false
+            }
+            PropertyChanges {
+                target: progressBar
+                x: 0
+            }
         },
         State {
             name: "showed"
-
             PropertyChanges {
                 target: backRecangle
                 x: 0
             }
+            PropertyChanges {
+                target: timer
+                running: true
+            }
+            PropertyChanges {
+                target: progressBar
+                x: progressBar.width
+            }
         }
     ]
-
 
 }

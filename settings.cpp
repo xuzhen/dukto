@@ -21,6 +21,7 @@
 
 #include <QSettings>
 #include <QDir>
+#include <QDate>
 #include "theme.h"
 
 
@@ -146,12 +147,12 @@ void Settings::saveCloseToTrayEnabled(bool enabled) {
     mSettings.sync();
 }
 
-bool Settings::autoCheckUpdate() {
-    return mSettings.value("CheckUpdate", true).toBool();
+bool Settings::autoCheckUpdates() {
+    return mSettings.value("CheckUpdates", true).toBool();
 }
 
-void Settings::saveAutoCheckUpdate(bool enabled) {
-    mSettings.setValue("CheckUpdate", enabled);
+void Settings::saveAutoCheckUpdates(bool enabled) {
+    mSettings.setValue("CheckUpdates", enabled);
     mSettings.sync();
 }
 

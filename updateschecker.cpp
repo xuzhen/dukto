@@ -33,12 +33,14 @@ UpdatesChecker::UpdatesChecker(QObject *parent) : QObject(parent)
 
 void UpdatesChecker::check()
 {
-    //emit updatesAvailable("6.9.9");
-    //emit checkEnd(true);
-
     // Send check request
-    QNetworkRequest request(QUrl("https://api.github.com/repos/xuzhen/dukto-qt5/releases/latest"));
+    QNetworkRequest request(QUrl("https://api.github.com/repos/xuzhen/dukto/releases/latest"));
     request.setRawHeader("Accept", "application/vnd.github+json");
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+    request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::SameOriginRedirectPolicy);
+#elif QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+    request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+#endif
     QNetworkAccessManager *nam = new QNetworkAccessManager();
     connect(nam, &QNetworkAccessManager::finished, this, &UpdatesChecker::updatedDataReady);
     connect(this, &UpdatesChecker::checkEnd, nam, &QNetworkAccessManager::deleteLater);

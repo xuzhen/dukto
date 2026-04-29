@@ -52,7 +52,7 @@ DuktoWindow::DuktoWindow(GuiBehind *gb, QQuickWidget *parent) :
     setWindowTitle("Dukto");
     setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint);
     setMaximumWidth(350);
-    setMinimumSize(350, 500);
+    setMinimumSize(350, 520);
     setWindowIcon(QIcon(":/dukto.png"));
 #endif
 

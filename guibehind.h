@@ -59,7 +59,9 @@ class GuiBehind : public QObject
     Q_PROPERTY(bool closeToTray READ closeToTray WRITE setCloseToTray NOTIFY closeToTrayChanged)
     Q_PROPERTY(bool autoMode READ autoMode WRITE setAutoMode NOTIFY autoModeChanged)
     Q_PROPERTY(bool darkMode READ darkMode WRITE setDarkMode NOTIFY darkModeChanged)
+#ifdef UPDATER
     Q_PROPERTY(bool autoCheck READ autoCheck WRITE setAutoCheck NOTIFY autoCheckChanged)
+#endif
     Q_PROPERTY(QString initError READ initError NOTIFY initErrorChanged)
     Q_PROPERTY(QString initErrorAction READ initErrorAction NOTIFY initErrorActionChanged)
     Q_PROPERTY(QMargins screenPadding READ screenPadding NOTIFY screenPaddingChanged)
@@ -119,8 +121,10 @@ public:
     bool autoMode();
     void setDarkMode(bool darkMode);
     bool darkMode();
+#ifdef UPDATER
     void setAutoCheck(bool enabled);
     bool autoCheck();
+#endif
     void setInitError(const QString &error, const QString &action = "Retry");
     QString initError();
     QString initErrorAction();
@@ -263,7 +267,7 @@ private:
     void startTransfer(const QString &text);
     void setThemeMode(bool darkMode);
 #ifdef UPDATER
-    void checkUpdate();
+    void checkUpdates(bool forceCheck);
 #endif
 };
 

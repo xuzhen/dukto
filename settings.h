@@ -48,8 +48,8 @@ public:
     void saveNotificationEnabled(bool enabled);
     bool closeToTrayEnabled();
     void saveCloseToTrayEnabled(bool enabled);
-    bool autoCheckUpdate();
-    void saveAutoCheckUpdate(bool enabled);
+    bool autoCheckUpdates();
+    void saveAutoCheckUpdates(bool enabled);
     QDate checkDate();
     void saveCheckDate();
 
