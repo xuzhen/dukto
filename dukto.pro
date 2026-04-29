@@ -1,12 +1,6 @@
 QT += core gui network qml quickwidgets
 linux:!android:QT += dbus
 
-greaterThan(QT_MAJOR_VERSION, 5) {
-    CONFIG += c++17
-} else {
-    CONFIG += c++11
-}
-
 #============Compiling Options=============
 
 # Allow only one instance
@@ -19,6 +13,18 @@ DEFINES += UPDATER
 #DEFINES += NOTIFY_LIBNOTIFY
 
 #==========================================
+
+equals(QT_MAJOR_VERSION, 5) {
+    lessThan(QT_MINOR_VERSION, 3) {
+        error("Dukto requires Qt 5.3+")
+    }
+}
+
+greaterThan(QT_MAJOR_VERSION, 5) {
+    CONFIG += c++17
+} else {
+    CONFIG += c++11
+}
 
 android: {
     DEFINES -= NOTIFY_LIBNOTIFY
