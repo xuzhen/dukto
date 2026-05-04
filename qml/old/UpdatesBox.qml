@@ -20,7 +20,7 @@ import QtQuick 2.3
 
 Item {
     id: box
-    width: parent.width * 0.7
+    width: Math.min(parent.width * 0.7, 400)
     implicitHeight: backRecangle.height
     clip: true
     state: (guiBehind.showUpdateBanner && (["","ip","progress"].indexOf(guiBehind.overlayState) >= 0)) ? "showed" : "hidden"
