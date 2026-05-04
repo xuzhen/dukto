@@ -229,7 +229,11 @@ void GuiBehind::receiveFileStart(const QString &senderIp)
 #ifdef Q_OS_WIN
     mView->showTaskbarProgress(0);
 #endif
-
+#ifdef Q_OS_ANDROID
+    if (showNotification()) {
+        AndroidNotification::start("Receiving ...", true);
+    }
+#endif
     emit transferStart();
 }
 
@@ -249,11 +253,22 @@ void GuiBehind::transferStatusUpdate(qint64 total, qint64 partial)
 #ifdef Q_OS_WIN
     mView->showTaskbarProgress(percent);
 #endif
+#ifdef Q_OS_ANDROID
+    if (showNotification()) {
+        AndroidNotification::setProgress(percent);
+    }
+#endif
 }
 
 void GuiBehind::transferItemUpdate(qint64 total, qint64 current, const QString &name) {
     const static QString textTemplate = QStringLiteral("(%1 / %2)  %3");
-    setCurrentTransferItem(textTemplate.arg(current).arg(total).arg(name));
+    QString text = textTemplate.arg(current).arg(total).arg(name);
+    setCurrentTransferItem(text);
+#ifdef Q_OS_ANDROID
+    if (showNotification()) {
+        AndroidNotification::setText(text);
+    }
+#endif
 }
 
 void GuiBehind::receiveFileComplete(const QString &name, const QString &path, qint64 size) {
@@ -275,6 +290,11 @@ void GuiBehind::receiveComplete() {
     // Update GUI
 #ifdef Q_OS_WIN
     mView->hideTaskbarProgress();
+#endif
+#ifdef Q_OS_ANDROID
+    if (showNotification()) {
+        AndroidNotification::setDone("All data received!");
+    }
 #endif
     QApplication::alert(mView, 5000);
     emit receiveCompleted();
@@ -583,7 +603,11 @@ bool GuiBehind::prepareStartTransfer(QString *ip, qint16 *port)
 #ifdef Q_OS_WIN
     mView->showTaskbarProgress(0);
 #endif
-
+#ifdef Q_OS_ANDROID
+    if (showNotification()) {
+        AndroidNotification::start("Sending ...", false);
+    }
+#endif
     emit transferStart();
     return true;
 }
@@ -602,7 +626,11 @@ void GuiBehind::sendFileComplete()
 #ifdef Q_OS_WIN
     mView->hideTaskbarProgress();
 #endif
-
+#ifdef Q_OS_ANDROID
+    if (showNotification()) {
+        AndroidNotification::setDone("Your data has been sent to your buddy!");
+    }
+#endif
     // Check for temporary file to delete
     if (!mScreenTempPath.isEmpty()) {
 
@@ -648,13 +676,18 @@ bool GuiBehind::canAcceptDrop()
 // Handles send error
 void GuiBehind::sendFileError(const QString &error)
 {
+    QString errorText = "Sorry, an error has occurred while sending your data...\n\n" + error;
     setMessagePageTitle("Error");
-    setMessagePageText("Sorry, an error has occurred while sending your data...\n\n" + error);
+    setMessagePageText(errorText);
     setMessagePageBackState("send");
 #ifdef Q_OS_WIN
     mView->stopTaskbarProgress();
 #endif
-
+#ifdef Q_OS_ANDROID
+    if (showNotification()) {
+        AndroidNotification::setError(error);
+    }
+#endif
     // Check for temporary file to delete
     if (!mScreenTempPath.isEmpty()) {
 
@@ -670,17 +703,27 @@ void GuiBehind::sendFileError(const QString &error)
 void GuiBehind::receiveFileCancelled(const QString &error)
 {
     if (error.isEmpty() == false) {
+        QString errorText = "An error has occurred during the transfer... The data you received could be incomplete or broken.\n\n" + error;
         setMessagePageTitle("Error");
-        setMessagePageText("An error has occurred during the transfer... The data you received could be incomplete or broken.\n\n" + error);
+        setMessagePageText(errorText);
         setMessagePageBackState("");
         emit gotoMessagePage();
+#ifdef Q_OS_ANDROID
+        if (showNotification()) {
+            AndroidNotification::setError(error);
+        }
+#endif
     } else {
         // no reason, cancelled by user
         emit receiveCompleted();
+#ifdef Q_OS_ANDROID
+        AndroidNotification::cancel();
+#endif
     }
 #ifdef Q_OS_WIN
     mView->stopTaskbarProgress();
 #endif
+
 }
 
 // Event handler to catch the "application activate" event
@@ -711,6 +754,11 @@ void GuiBehind::resetProgressStatus()
 {
 #ifdef Q_OS_WIN
     mView->hideTaskbarProgress();
+#endif
+#ifdef Q_OS_ANDROID
+    if (showNotification()) {
+        AndroidNotification::cancel();
+    }
 #endif
 }
 

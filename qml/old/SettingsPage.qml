@@ -252,10 +252,8 @@ Flickable {
             anchors.topMargin: -10
         }
 
-
         CheckBox {
             id: nswitch
-            visible: guiBehind.isDesktopApp()
             anchors.top: tmswitch.bottom
             anchors.left: labelPath.left
             anchors.topMargin: 15
@@ -278,7 +276,7 @@ Flickable {
         CheckBox {
             id: uswitch
             visible: guiBehind.hasUpdater()
-            anchors.top: cswitch.bottom
+            anchors.top: guiBehind.isDesktopApp() ? cswitch.bottom : nswitch.bottom
             anchors.left: labelPath.left
             anchors.topMargin: 15
             text: "Check for updates"

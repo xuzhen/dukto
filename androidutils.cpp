@@ -815,5 +815,47 @@ void AndroidTheme::setSystemBarsNightMode(bool nightMode, QJniObject &decorView)
     }
 }
 
+/*============================================================*/
+
+const char* AndroidNotification::javaClassPath = "com/github/xuzhen/dukto/NotificationHelper";
+
+void AndroidNotification::start(const QString& title, bool download) {
+    static bool inited = false;
+    if (!inited) {
+        QJniObject context = getContext();
+        QJniObject::callStaticMethod<void>(javaClassPath, "init", "(Landroid/content/Context;)V", context.object(), static_cast<jboolean>(download));
+        inited = true;
+    }
+    QJniObject jTitle = QJniObject::fromString(title);
+    QJniObject::callStaticMethod<void>(javaClassPath, "start", "(Ljava/lang/String;Z)V", jTitle.object<jstring>());
+}
+
+void AndroidNotification::setProgress(int percent) {
+    QJniObject::callStaticMethod<void>(javaClassPath, "setProgress", "(I)V", percent);
+}
+
+void AndroidNotification::setText(const QString& text) {
+    QJniObject jText = QJniObject::fromString(text);
+    QJniObject::callStaticMethod<void>(javaClassPath, "setText", "(Ljava/lang/String;)V", jText.object<jstring>());
+}
+
+void AndroidNotification::setTitle(const QString& title) {
+    QJniObject jTitle = QJniObject::fromString(title);
+    QJniObject::callStaticMethod<void>(javaClassPath, "setTitle", "(Ljava/lang/String;)V", jTitle.object<jstring>());
+}
+
+void AndroidNotification::setError(const QString &error) {
+    QJniObject jError = QJniObject::fromString(error);
+    QJniObject::callStaticMethod<void>(javaClassPath, "setError", "(Ljava/lang/String;)V", jError.object<jstring>());
+}
+
+void AndroidNotification::setDone(const QString &text) {
+    QJniObject jText = QJniObject::fromString(text);
+    QJniObject::callStaticMethod<void>(javaClassPath, "setDone", "(Ljava/lang/String;)V", jText.object<jstring>());
+}
+
+void AndroidNotification::cancel() {
+    QJniObject::callStaticMethod<void>(javaClassPath, "cancel");
+}
 
 #endif

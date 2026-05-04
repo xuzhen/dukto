@@ -181,9 +181,11 @@ android {
     greaterThan(QT_MAJOR_VERSION, 5) {
         ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android/qt6
         OTHER_FILES += $$PWD/android/qt6/AndroidManifest.xml
+        OTHER_FILES += $$PWD/android/qt6/src/com/github/xuzhen/dukto/NotificationHelper.java
     } else {
         ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android/qt5
         OTHER_FILES += $$PWD/android/qt5/AndroidManifest.xml
+        OTHER_FILES += $$PWD/android/qt5/src/com/github/xuzhen/dukto/NotificationHelper.java
     }
     SOURCES += androidutils.cpp
     HEADERS += androidutils.h
