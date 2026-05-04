@@ -18,26 +18,15 @@
  */
 
 #include <QtGlobal>
-#ifdef NOTIFY_LIBNOTIFY
-#include <libnotify/notify.h>
-#endif
-
 #include "systemtray.h"
-#include "settings.h"
-
-#include <QWidget>
 #include <QMenu>
 #include <QAction>
 #include <QApplication>
 
-SystemTray::SystemTray(DuktoWindow& window, QObject* parent) :
+SystemTray::SystemTray(DuktoWindow *window, QObject* parent) :
     QSystemTrayIcon(parent),
     window(window)
 {
-#ifdef NOTIFY_LIBNOTIFY
-    notify_init ("Dukto");
-#endif
-
     QIcon icon(":/dukto.png");
 #if defined(Q_OS_MAC) && QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     icon.setIsMask(true);
@@ -47,7 +36,7 @@ SystemTray::SystemTray(DuktoWindow& window, QObject* parent) :
     connect(this, &SystemTray::activated, this, &SystemTray::on_activated);
 #endif
     
-    QMenu *trayMenu = new QMenu(&window);
+    QMenu *trayMenu = new QMenu(window);
     QAction *ShowHide = new QAction(QString("Show/Hide"), trayMenu);
     connect(ShowHide, &QAction::triggered, this, [=]() { on_activated(QSystemTrayIcon::Trigger); });
     trayMenu->addAction(ShowHide);
@@ -55,14 +44,7 @@ SystemTray::SystemTray(DuktoWindow& window, QObject* parent) :
     connect(Exit, &QAction::triggered, this, [=]() { on_activated(QSystemTrayIcon::MiddleClick); });
     trayMenu->addAction(Exit);
     this->setContextMenu(trayMenu);
-    connect(trayMenu, &QMenu::aboutToShow, this, [&window, ShowHide]() { ShowHide->setText((window.isHidden() || window.isMinimized()) ? "Show" : "Hide"); });
-}
-
-SystemTray::~SystemTray()
-{
-#ifdef NOTIFY_LIBNOTIFY
-    notify_uninit();
-#endif
+    connect(trayMenu, &QMenu::aboutToShow, this, [window, ShowHide]() { ShowHide->setText((window->isHidden() || window->isMinimized()) ? "Show" : "Hide"); });
 }
 
 void SystemTray::on_activated(QSystemTrayIcon::ActivationReason reason)
@@ -70,15 +52,15 @@ void SystemTray::on_activated(QSystemTrayIcon::ActivationReason reason)
     switch(reason)
     {
         case QSystemTrayIcon::Trigger:
-            if (window.isHidden() || window.isMinimized()) {
-                window.activateWindow();
+            if (window->isHidden() || window->isMinimized()) {
+                window->activateWindow();
             } else {
-                window.hide();
+                window->hide();
             }
             break;
         case QSystemTrayIcon::MiddleClick:
-            window.hide();
-            window.close();
+            window->hide();
+            window->close();
             QApplication::quit();
             break;
         case QSystemTrayIcon::Context:
@@ -89,33 +71,7 @@ void SystemTray::on_activated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
-void SystemTray::received_file(const QString &name, const QString &path, qint64 size)
-{
-    Q_UNUSED(size)
-    Q_UNUSED(path)
-    notify("Recieved File", name);
-}
-
-void SystemTray::received_folder(const QString &name, const QString &path) {
-    Q_UNUSED(path)
-    notify("Recieved Folder", name);
-}
-
-void SystemTray::received_text(const QString &text)
-{
-    notify("Recieved Text Snippet", text);
-}
-
 void SystemTray::notify(const QString &title, const QString &body)
 {
-    if (!gSettings->notificationEnabled()) {
-        return;
-    }
-#ifdef NOTIFY_LIBNOTIFY
-    NotifyNotification* msg = notify_notification_new(title.toUtf8().constData(), body.toUtf8().constData(), nullptr);
-    notify_notification_show (msg, nullptr);
-    g_object_unref(G_OBJECT(msg));
-#else
     this->showMessage(title, body);
-#endif
 }

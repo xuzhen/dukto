@@ -75,6 +75,7 @@ SOURCES += main.cpp \
     settings.cpp \
     destinationbuddy.cpp \
     duktowindow.cpp \
+    systemnotification.cpp \
     theme.cpp \
     systemtray.cpp
 
@@ -95,6 +96,7 @@ HEADERS += \
     settings.h \
     destinationbuddy.h \
     duktowindow.h \
+    systemnotification.h \
     theme.h \
     systemtray.h \
     version.h

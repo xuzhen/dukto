@@ -27,21 +27,14 @@ class SystemTray : public QSystemTrayIcon
 {
         Q_OBJECT
     public:
-        explicit SystemTray(DuktoWindow& window, QObject *parent = nullptr);
-        ~SystemTray();
-
-    public Q_SLOTS:
-        void received_file(const QString &name, const QString &path, qint64 size);
-        void received_folder(const QString &name, const QString &path);
-        void received_text(const QString &text);
+        explicit SystemTray(DuktoWindow *window, QObject *parent = nullptr);
+        void notify(const QString &title, const QString &body);
 
     private Q_SLOTS:
         void on_activated(QSystemTrayIcon::ActivationReason reason);
 
     private:
-        DuktoWindow& window;
-
-        void notify(const QString &title, const QString &body);
+        DuktoWindow *window;
 };
 
 #endif // SYSTEMTRAY_H

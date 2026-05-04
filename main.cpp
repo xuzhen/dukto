@@ -76,13 +76,9 @@ int main(int argc, char *argv[])
     QObject::connect(&app, &SingleApplication::receivedMessage, &viewer, &DuktoWindow::activateWindow);
 #endif
 
+    gb.setViewer(&viewer);
 #ifdef DESKTOP_APP
-    SystemTray tray(viewer);
-    gb.setViewer(&viewer, &tray);
     viewer.setVisible(!parser.isSet(hideOption));
-    tray.show();
-#else
-    gb.setViewer(&viewer, nullptr);
 #endif
 
     return app.exec();

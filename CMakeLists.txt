@@ -107,6 +107,7 @@ set(DUKTO_HDR
     platform.h
     recentlistitemmodel.h
     settings.h
+    systemnotification.h
     systemtray.h
     theme.h
 )
@@ -128,6 +129,7 @@ set(DUKTO_SRC
     platform.cpp
     recentlistitemmodel.cpp
     settings.cpp
+    systemnotification.cpp
     systemtray.cpp
     theme.cpp
 )

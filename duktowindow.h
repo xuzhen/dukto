@@ -26,6 +26,9 @@ class EcWin7;
 #endif
 class GuiBehind;
 class PlatformObserver;
+#ifdef DESKTOP_APP
+class SystemTray;
+#endif
 
 class DuktoWindow : public QQuickWidget
 {
@@ -33,9 +36,13 @@ class DuktoWindow : public QQuickWidget
 public:
     explicit DuktoWindow(GuiBehind* gb, QQuickWidget *parent = nullptr);
     virtual ~DuktoWindow();
-    void showTaskbarProgress(uint percent);
-    void hideTaskbarProgress();
-    void stopTaskbarProgress();
+
+#ifdef DESKTOP_APP
+    SystemTray *getTray();
+#endif
+#ifdef Q_OS_WIN
+    EcWin7 *getTaskBar();
+#endif
 
 public Q_SLOTS:
     void activateWindow();
@@ -64,11 +71,13 @@ protected:
 
 private:
     GuiBehind *mGuiBehind;
-    bool debuted = false;
 #ifdef Q_OS_WIN
     EcWin7 *mWin7 = nullptr;
 #endif
     PlatformObserver *mObserver = nullptr;
+#ifdef DESKTOP_APP
+    SystemTray *mTray = nullptr;
+#endif
 #ifdef Q_OS_MAC
     void setupDockHandler();
 #endif

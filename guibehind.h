@@ -30,7 +30,7 @@
 
 class MiniWebServer;
 class DuktoWindow;
-class SystemTray;
+class SystemNotification;
 
 class GuiBehind : public QObject
 {
@@ -70,7 +70,7 @@ public:
     explicit GuiBehind();
     virtual ~GuiBehind();
 
-    void setViewer(DuktoWindow *view, SystemTray *tray);
+    void setViewer(DuktoWindow *view);
     bool canAcceptDrop();
     void sendDroppedFiles(QStringList *files);
     void close();
@@ -228,11 +228,11 @@ private Q_SLOTS:
 
 private:
     DuktoWindow *mView = nullptr;
-    SystemTray *mTray = nullptr;
     QTimer *mShowBackTimer = nullptr;
     QTimer *mPeriodicHelloTimer = nullptr;
     MiniWebServer *mMiniWebServer = nullptr;
     DestinationBuddy *mDestBuddy = nullptr;
+    SystemNotification *notifier = nullptr;
     BuddyListItemModel mBuddiesList;
     RecentListItemModel mRecentList;
     IpAddressItemModel mIpAddresses;

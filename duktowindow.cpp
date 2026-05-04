@@ -41,6 +41,7 @@ static DuktoWindow *instance = nullptr;
 #ifdef DESKTOP_APP
 #include <QCoreApplication>
 #include <QDir>
+#include "systemtray.h"
 #endif
 
 DuktoWindow::DuktoWindow(GuiBehind *gb, QQuickWidget *parent) :
@@ -88,6 +89,9 @@ DuktoWindow::DuktoWindow(GuiBehind *gb, QQuickWidget *parent) :
     if (qmlDir.cd("qml")) {
         engine()->addImportPath(qmlDir.path());
     }
+
+    mTray = new SystemTray(this);
+    mTray->show();
 #endif
 
     mObserver = new PlatformObserver();
@@ -98,35 +102,23 @@ DuktoWindow::~DuktoWindow() {
 #ifdef Q_OS_WIN
     delete mWin7;
 #endif
+#ifdef DESKTOP_APP
+    delete mTray;
+#endif
     delete mObserver;
 }
 
-void DuktoWindow::showTaskbarProgress(uint percent) {
-#ifdef Q_OS_WIN
-    if (mWin7 != nullptr) {
-        mWin7->setProgressState(EcWin7::Normal);
-        mWin7->setProgressValue(percent, 100);
-    }
-#else
-    Q_UNUSED(percent)
-#endif
+#ifdef DESKTOP_APP
+SystemTray *DuktoWindow::getTray() {
+    return mTray;
 }
+#endif
 
-void DuktoWindow::hideTaskbarProgress() {
 #ifdef Q_OS_WIN
-    if (mWin7 != nullptr) {
-        mWin7->setProgressState(EcWin7::NoProgress);
-    }
-#endif
+EcWin7 *DuktoWindow::getTaskBar() {
+    return mWin7;
 }
-
-void DuktoWindow::stopTaskbarProgress() {
-#ifdef Q_OS_WIN
-    if (mWin7 != nullptr) {
-        mWin7->setProgressState(EcWin7::Error);
-    }
 #endif
-}
 
 void DuktoWindow::activateWindow() {
     showNormal();
@@ -219,6 +211,7 @@ void DuktoWindow::closeEvent(QCloseEvent *event)
 
 void DuktoWindow::showEvent(QShowEvent *event) {
     QQuickWidget::showEvent(event);
+    static bool debuted = false;
     if (!debuted) {
 #if defined(Q_OS_WIN)
         QWindow *win = windowHandle();
