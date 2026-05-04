@@ -76,9 +76,9 @@ void SystemNotification::notifyTransferringCompleted(bool inbound) {
     }
 #ifdef Q_OS_ANDROID
     if (inbound) {
-        AndroidNotification::setDone("All data has been sent!");
-    } else {
         AndroidNotification::setDone("All data has been received!");
+    } else {
+        AndroidNotification::setDone("All data has been sent!");
     }
 #else
     Q_UNUSED(inbound)

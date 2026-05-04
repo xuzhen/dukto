@@ -820,14 +820,8 @@ void AndroidTheme::setSystemBarsNightMode(bool nightMode, QJniObject &decorView)
 const char* AndroidNotification::javaClassPath = "com/github/xuzhen/dukto/NotificationHelper";
 
 void AndroidNotification::start(const QString& title, bool download) {
-    static bool inited = false;
-    if (!inited) {
-        QJniObject context = getContext();
-        QJniObject::callStaticMethod<void>(javaClassPath, "init", "(Landroid/content/Context;)V", context.object(), static_cast<jboolean>(download));
-        inited = true;
-    }
     QJniObject jTitle = QJniObject::fromString(title);
-    QJniObject::callStaticMethod<void>(javaClassPath, "start", "(Ljava/lang/String;Z)V", jTitle.object<jstring>());
+    QJniObject::callStaticMethod<void>(javaClassPath, "start", "(Landroid/content/Context;Ljava/lang/String;Z)V", getContext().object(), jTitle.object<jstring>(), static_cast<jboolean>(download));
 }
 
 void AndroidNotification::setProgress(int percent) {
@@ -837,11 +831,6 @@ void AndroidNotification::setProgress(int percent) {
 void AndroidNotification::setText(const QString& text) {
     QJniObject jText = QJniObject::fromString(text);
     QJniObject::callStaticMethod<void>(javaClassPath, "setText", "(Ljava/lang/String;)V", jText.object<jstring>());
-}
-
-void AndroidNotification::setTitle(const QString& title) {
-    QJniObject jTitle = QJniObject::fromString(title);
-    QJniObject::callStaticMethod<void>(javaClassPath, "setTitle", "(Ljava/lang/String;)V", jTitle.object<jstring>());
 }
 
 void AndroidNotification::setError(const QString &error) {

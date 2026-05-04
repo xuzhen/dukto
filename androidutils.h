@@ -191,7 +191,6 @@ public:
     static void start(const QString &titleText, bool download);
     static void setProgress(int percent);
     static void setText(const QString &text);
-    static void setTitle(const QString &title);
     static void setError(const QString &error);
     static void setDone(const QString &text);
     static void cancel();

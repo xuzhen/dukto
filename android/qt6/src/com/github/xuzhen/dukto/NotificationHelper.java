@@ -11,34 +11,36 @@ public class NotificationHelper {
     private static final int NOTIFY_ID = 1001;
     private static NotificationManager notificationManager;
     private static NotificationCompat.Builder builder;
-    private static boolean receiving;
     private static int lastProgress;
+    private static Context currentContext;
+    private static String currentTitle;
+    private static boolean receiving;
 
-    public static void init(Context context) {
-        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Transferring Progress", NotificationManager.IMPORTANCE_LOW);
-            notificationManager.createNotificationChannel(channel);
-        }
-        builder = new NotificationCompat.Builder(context, CHANNEL_ID);
-        builder.setOnlyAlertOnce(true);
-    }
-
-    public static void start(String title, boolean isDownload) {
-        if (builder != null && notificationManager != null) {
-            receiving = isDownload;
-            builder.setContentTitle(title)
-                   .setContentText("")
-                   .setProgress(100, 0, false)
-                   .setOngoing(true);
-            if (receiving) {
-                builder.setSmallIcon(android.R.drawable.stat_sys_download);
-            } else {
-                builder.setSmallIcon(android.R.drawable.stat_sys_upload);
+    public static void start(Context context, String title, boolean isDownload) {
+        if (notificationManager == null) {
+            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Transferring Progress", NotificationManager.IMPORTANCE_DEFAULT);
+                notificationManager.createNotificationChannel(channel);
             }
-            lastProgress = 0;
-            notificationManager.notify(NOTIFY_ID, builder.build());
         }
+        notificationManager.cancel(NOTIFY_ID);
+        builder = new NotificationCompat.Builder(context, CHANNEL_ID);
+        builder.setContentTitle(title)
+               .setContentText("")
+               .setProgress(100, 0, false)
+               .setOngoing(true)
+               .setOnlyAlertOnce(true);
+        if (isDownload) {
+            builder.setSmallIcon(android.R.drawable.stat_sys_download);
+        } else {
+            builder.setSmallIcon(android.R.drawable.stat_sys_upload);
+        }
+        lastProgress = 0;
+        currentContext = context;
+        currentTitle = title;
+        receiving = isDownload;
+        notificationManager.notify(NOTIFY_ID, builder.build());
     }
 
     public static void setProgress(int progress) {
@@ -58,46 +60,44 @@ public class NotificationHelper {
         }
     }
 
-    public static void setTitle(String title) {
-        if (builder != null && notificationManager != null) {
-            builder.setContentTitle(title);
-            notificationManager.notify(NOTIFY_ID, builder.build());
-        }
-    }
-
     public static void setDone(String text) {
         if (builder != null && notificationManager != null) {
+            notificationManager.cancel(NOTIFY_ID);
+            builder = new NotificationCompat.Builder(currentContext, CHANNEL_ID);
             if (receiving) {
                 builder.setSmallIcon(android.R.drawable.stat_sys_download_done);
             } else {
                 builder.setSmallIcon(android.R.drawable.stat_sys_upload_done);
             }
-            builder.setContentText(text)
-                   .setProgress(0, 0, false)
-                   .setOngoing(false);
-            lastProgress = -1;
+            builder.setContentTitle(currentTitle)
+                   .setContentText(text);
             notificationManager.notify(NOTIFY_ID, builder.build());
+            builder = null;
+            currentContext = null;
+            currentTitle = null;
         }
     }
 
     public static void setError(String error) {
         if (builder != null && notificationManager != null) {
+            notificationManager.cancel(NOTIFY_ID);
+            builder = new NotificationCompat.Builder(currentContext, CHANNEL_ID);
             builder.setSmallIcon(android.R.drawable.stat_notify_error)
-                   .setContentText(error)
-                   .setOngoing(false);
-            // wait a bit to ensure UI refreshing
-            try {
-                Thread.sleep(100);
-            } catch(InterruptedException e) {
-                e.printStackTrace();
-            }
+                   .setContentTitle(currentTitle)
+                   .setContentText(error);
             notificationManager.notify(NOTIFY_ID, builder.build());
+            builder = null;
+            currentContext = null;
+            currentTitle = null;
         }
     }
 
     public static void cancel() {
         if (notificationManager != null) {
             notificationManager.cancel(NOTIFY_ID);
+            builder = null;
+            currentContext = null;
+            currentTitle = null;
         }
     }
 }
