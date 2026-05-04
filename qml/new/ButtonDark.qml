@@ -46,10 +46,6 @@ Rectangle {
         hoverEnabled: true
         enabled: button.buttonEnabled
         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ForbiddenCursor
-        Connections {
-            function onClicked() {
-                button.clicked();
-            }
-        }
+        onClicked: button.clicked();
     }
 }

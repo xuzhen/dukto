@@ -57,19 +57,11 @@ Rectangle {
         drag.maximumY: switchBox.height - indicator.height
         drag.onActiveChanged: {
             if (!drag.active) {
-                if (indicator.y >= (drag.maximumY - drag.minimumY) / 2) {
-                    indicator.y = drag.maximumY
-                    guiBehind.darkMode = true
-                } else {
-                    indicator.y = drag.minimumY
-                    guiBehind.darkMode = false
-                }
+                guiBehind.darkMode = (indicator.y >= (drag.maximumY - drag.minimumY) / 2);
+                // binding will be lost after dragging
+                indicator.y = Qt.binding(function() { return guiBehind.darkMode ? indicatorArea.drag.maximumY : indicatorArea.drag.minimumY });
             }
         }
-        onClicked: {
-            guiBehind.darkMode = !guiBehind.darkMode;
-            // walkaround a Qt bug: after dragging, the clicking won't change indicator.y
-            indicator.y = guiBehind.darkMode ? drag.maximumY : drag.minimumY
-        }
+        onClicked: guiBehind.darkMode = !guiBehind.darkMode;
     }
 }

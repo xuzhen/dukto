@@ -70,13 +70,11 @@ Flickable {
                      id: recentMouseArea
                      anchors.fill: parent
                      hoverEnabled: true
-                     Connections {
-                         function onClicked() {
-                             if (type === "text")
-                                guiBehind.showTextSnippet(value, sender);
-                             else if (type === "file" || type === "dir")
-                                guiBehind.openFile(value);
-                         }
+                     onClicked: {
+                         if (type === "text")
+                             guiBehind.showTextSnippet(value, sender);
+                         else if (type === "file" || type === "dir")
+                             guiBehind.openFile(value);
                      }
                  }
 

@@ -44,11 +44,9 @@ Item {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-                Connections {
-                    function onClicked() {
-                        tabBar.state = "buddies";
-                        tabBar.clicked("buddies");
-                    }
+                onClicked: {
+                    tabBar.state = "buddies";
+                    tabBar.clicked("buddies");
                 }
             }
         }
@@ -67,11 +65,9 @@ Item {
                 anchors.fill: parent;
                 hoverEnabled: true;
                 cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-                Connections {
-                    function onClicked() {
-                        tabBar.state = "recent";
-                        tabBar.clicked("recent");
-                    }
+                onClicked: {
+                    tabBar.state = "recent";
+                    tabBar.clicked("recent");
                 }
             }
         }
@@ -87,11 +83,9 @@ Item {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-                Connections {
-                    function onClicked() {
-                        tabBar.state = "about";
-                        tabBar.clicked("about");
-                    }
+                onClicked: {
+                    tabBar.state = "about";
+                    tabBar.clicked("about");
                 }
             }
         }

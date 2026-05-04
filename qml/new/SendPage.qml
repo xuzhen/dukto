@@ -55,11 +55,7 @@ Flickable {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-                Connections {
-                    function onClicked() {
-                        sendPage.back();
-                    }
-                }
+                onClicked: sendPage.back();
             }
         }
 
@@ -156,11 +152,7 @@ Flickable {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    Connections {
-                        function onClicked() {
-                            guiBehind.pasteDestinationIp();
-                        }
-                    }
+                    onClicked: guiBehind.pasteDestinationIp();
                 }
             }
 

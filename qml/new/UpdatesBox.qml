@@ -49,11 +49,9 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            Connections {
-                function onClicked() {
-                    Qt.openUrlExternally("https://github.com/xuzhen/dukto/releases/v" + guiBehind.latestVersion)
-                    timer.triggered()
-                }
+            onClicked: {
+                Qt.openUrlExternally("https://github.com/xuzhen/dukto/releases/v" + guiBehind.latestVersion)
+                timer.triggered()
             }
         }
 

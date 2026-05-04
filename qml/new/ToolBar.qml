@@ -64,11 +64,7 @@ Item {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-                Connections {
-                    function onClicked() {
-                        guiBehind.openDestinationFolder();
-                    }
-                }
+                onClicked: guiBehind.openDestinationFolder();
             }
         }
         SText {
@@ -97,11 +93,9 @@ Item {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-                Connections {
-                    function onClicked() {
-                        guiBehind.refreshIpList();
-                        toolBar.clicked("ip");
-                    }
+                onClicked: {
+                    guiBehind.refreshIpList();
+                    toolBar.clicked("ip");
                 }
             }
         }
@@ -130,11 +124,7 @@ Item {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-                Connections {
-                    function onClicked() {
-                        toolBar.clicked("settings")
-                    }
-                }
+                onClicked: toolBar.clicked("settings")
             }
         }
         SText {
@@ -165,14 +155,11 @@ Item {
             anchors.right: parent.right
             hoverEnabled: true
             cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-
-            Connections {
-                function onClicked() {
-                    if (toolBar.state === "WithoutLabels")
-                        toolBar.state = "WithLabels";
-                    else
-                        toolBar.state = "WithoutLabels";
-                }
+            onClicked: {
+                if (toolBar.state === "WithoutLabels")
+                    toolBar.state = "WithLabels";
+                else
+                    toolBar.state = "WithoutLabels";
             }
         }
     }

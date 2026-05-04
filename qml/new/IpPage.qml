@@ -77,11 +77,7 @@ Rectangle {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-                Connections {
-                    function onClicked() {
-                        ipPage.back();
-                    }
-                }
+                onClicked: ipPage.back();
             }
         }
 

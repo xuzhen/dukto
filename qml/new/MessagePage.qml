@@ -77,11 +77,9 @@ Rectangle {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-                Connections {
-                    function onClicked() {
-                        guiBehind.resetProgressStatus();
-                        messagePage.back(guiBehind.messagePageBackState);
-                    }
+                onClicked: {
+                    guiBehind.resetProgressStatus();
+                    messagePage.back(guiBehind.messagePageBackState);
                 }
             }
         }

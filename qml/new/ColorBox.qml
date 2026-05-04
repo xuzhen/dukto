@@ -37,10 +37,6 @@ Rectangle {
         hoverEnabled: true
         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
         anchors.fill: parent
-        Connections {
-            function onClicked() {
-                root.clicked(color)
-            }
-        }
+        onClicked: root.clicked(color)
     }
 }

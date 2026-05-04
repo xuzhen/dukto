@@ -51,13 +51,7 @@ Rectangle {
         hoverEnabled: true
         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
         anchors.fill: parent
-        Connections {
-            function onClicked() {
-                guiBehind.darkMode = !guiBehind.darkMode;
-                // walkaround a Qt bug: after dragging, the clicking won't change indicator.x
-                indicator.x = (guiBehind.darkMode ? handler.xAxis.maximum : handler.xAxis.minimum)
-            }
-        }
+        onClicked: guiBehind.darkMode = !guiBehind.darkMode;
     }
 
     DragHandler {
@@ -69,13 +63,9 @@ Rectangle {
         xAxis.minimum: 0
         onActiveChanged: {
             if (!active) {
-                if (indicator.x >= (xAxis.maximum - xAxis.minimum) / 2) {
-                    guiBehind.darkMode = true
-                    indicator.x = xAxis.maximum
-                } else {
-                    guiBehind.darkMode = false
-                    indicator.x = xAxis.minimum
-                }
+                guiBehind.darkMode = (indicator.x >= (xAxis.maximum - xAxis.minimum) / 2);
+                // binding will be lost after dragging
+                indicator.x = Qt.binding(function() { return guiBehind.darkMode ? handler.xAxis.maximum : handler.xAxis.minimum });
             }
         }
     }

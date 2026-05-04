@@ -45,13 +45,11 @@ Rectangle {
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-            Connections {
-                function onClicked() {
-                    if (guiBehind.textSnippetSending)
-                        showTextPage.backOnSend();
-                    else
-                        showTextPage.back();
-                }
+            onClicked: {
+                if (guiBehind.textSnippetSending)
+                    showTextPage.backOnSend();
+                else
+                    showTextPage.back();
             }
         }
     }

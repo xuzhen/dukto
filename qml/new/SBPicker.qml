@@ -76,13 +76,11 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: containsMouse ? (pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor) : Qt.ArrowCursor
-        Connections {
-            function onPositionChanged(mouse) {
-                handleMouse(mouse)
-            }
-            function onPressed(mouse) {
-                handleMouse(mouse)
-            }
+        onPositionChanged: function(mouse) {
+            handleMouse(mouse)
+        }
+        onPressed: function(mouse) {
+            handleMouse(mouse)
         }
     }
 }

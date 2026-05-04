@@ -36,13 +36,11 @@ Flipable {
        anchors.fill: parent
        hoverEnabled: true
        cursorShape: (buddyIp !== "-" && containsMouse) ? Qt.PointingHandCursor : Qt.ArrowCursor
-       Connections {
-           function onClicked() {
-               if (buddyIp !== "") {
-                   guiBehind.showSendPage(buddyIp)
-               } else {
-                   guiBehind.showProfilePage()
-               }
+       onClicked: {
+           if (buddyIp !== "") {
+               guiBehind.showSendPage(buddyIp)
+           } else {
+               guiBehind.showProfilePage()
            }
        }
    }

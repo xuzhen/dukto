@@ -77,11 +77,9 @@ Rectangle {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-                Connections {
-                    function onClicked() {
-                        nameText.editingFinished();
-                        profilePage.back();
-                    }
+                onClicked: {
+                    nameText.editingFinished();
+                    profilePage.back();
                 }
             }
         }
@@ -181,11 +179,7 @@ Rectangle {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    Connections {
-                        function onClicked() {
-                            guiBehind.selectAvatar();
-                        }
-                    }
+                    onClicked: guiBehind.selectAvatar();
                 }
             }
         }
