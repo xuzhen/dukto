@@ -20,23 +20,22 @@ import QtQuick 2.14
 
 Rectangle {
     id: switchBox
-    implicitWidth: 64
-    implicitHeight: 28
+    implicitWidth: 44
+    implicitHeight: 24
     border.color: indicatorArea.containsMouse ? theme.dimmedTextColor : theme.borderColor
     border.width: 2
     radius: height / 2
     gradient: Gradient {
         orientation: Gradient.Horizontal
-        GradientStop { position: 0.1; color: "#FAFAFA" }
-        GradientStop { position: 0.9; color: "#050505" }
+        GradientStop { position: 0.1; color: "#F0F0F0" }
+        GradientStop { position: 0.9; color: "#0F0F0F" }
     }
 
     Rectangle {
         id: indicator
         anchors.top: parent.top
-        anchors.topMargin: -4
         color: theme.bgColor
-        height: parent.height + 8
+        height: parent.height
         width: height
         radius: height / 2
         border.color: parent.border.color
@@ -55,6 +54,8 @@ Rectangle {
         Connections {
             function onClicked() {
                 guiBehind.darkMode = !guiBehind.darkMode;
+                // walkaround a Qt bug: after dragging, the clicking won't change indicator.x
+                indicator.x = (guiBehind.darkMode ? handler.xAxis.maximum : handler.xAxis.minimum)
             }
         }
     }
@@ -64,8 +65,8 @@ Rectangle {
         target: indicator
         yAxis.enabled: false
         xAxis.enabled: true
-        xAxis.maximum: switchBox.width - indicator.width + 1
-        xAxis.minimum: -1
+        xAxis.maximum: switchBox.width - indicator.width
+        xAxis.minimum: 0
         onActiveChanged: {
             if (!active) {
                 if (indicator.x >= (xAxis.maximum - xAxis.minimum) / 2) {

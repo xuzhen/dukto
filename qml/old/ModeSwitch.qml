@@ -20,23 +20,22 @@ import QtQuick 2.3
 
 Rectangle {
     id: switchBox
-    implicitWidth: 28
-    implicitHeight: 64
+    implicitWidth: 24
+    implicitHeight: 44
     border.color: indicatorArea.containsMouse ? theme.dimmedTextColor : theme.borderColor
     border.width: 2
     radius: width / 2
     rotation: -90
     gradient: Gradient {
-        GradientStop { position: 0.1; color: "#FAFAFA" }
-        GradientStop { position: 0.9; color: "#050505" }
+        GradientStop { position: 0.1; color: "#F0F0F0" }
+        GradientStop { position: 0.9; color: "#0F0F0F" }
     }
 
     Rectangle {
         id: indicator
         anchors.left: parent.left
-        anchors.leftMargin: -4
         color: theme.bgColor
-        width: parent.width + 8
+        width: parent.width
         height: width
         radius: width / 2
         border.color: parent.border.color
@@ -54,8 +53,8 @@ Rectangle {
         anchors.fill: parent
         drag.target: indicator
         drag.axis: Drag.YAxis
-        drag.minimumY: -1
-        drag.maximumY: switchBox.height - indicator.height + 1
+        drag.minimumY: 0
+        drag.maximumY: switchBox.height - indicator.height
         drag.onActiveChanged: {
             if (!drag.active) {
                 if (indicator.y >= (drag.maximumY - drag.minimumY) / 2) {

@@ -248,8 +248,8 @@ Flickable {
             visible: !tmswitch.checked
             anchors.top: tmswitch.top
             anchors.left: tmswitch.right
-            anchors.leftMargin: 30
-            anchors.topMargin: -20
+            anchors.leftMargin: 20
+            anchors.topMargin: -10
         }
 
 

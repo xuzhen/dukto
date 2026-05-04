@@ -300,7 +300,7 @@ Flickable {
             anchors.top: tmswitch.top
             anchors.left: tmswitch.right
             anchors.leftMargin: 10
-            anchors.topMargin: -2
+            anchors.topMargin: 0
         }
 
         CheckBox {
