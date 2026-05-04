@@ -26,8 +26,22 @@ Rectangle {
 
     property bool checked: false
     property alias text: label.text
+    property var canToggle: undefined
 
     signal clicked(bool checked)
+
+    function attemptToggle(targetChecked) {
+        if (targetChecked === checked) {
+            return;
+        }
+        if (canToggle !== undefined && typeof canToggle === "function") {
+            if (!canToggle(targetChecked)) {
+                return;
+            }
+        }
+        checked = targetChecked;
+        clicked(checked);
+    }
 
     Rectangle {
         id: checkbox
@@ -58,12 +72,7 @@ Rectangle {
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-            Connections {
-                function onClicked() {
-                    checked = !checked;
-                    clicked(checked)
-                }
-            }
+            onClicked: container.attemptToggle(!checked);
         }
 
         DragHandler {
@@ -75,15 +84,9 @@ Rectangle {
             xAxis.minimum: 0
             onActiveChanged: {
                 if (!active) {
-                    if (indicator.x >= (xAxis.maximum - xAxis.minimum) / 2) {
-                        indicator.x = xAxis.maximum
-                        checked = true
-                        clicked(true)
-                    } else {
-                        indicator.x = xAxis.minimum
-                        checked = false
-                        clicked(false)
-                    }
+                    attemptToggle(indicator.x >= (xAxis.maximum - xAxis.minimum) / 2)
+                    // binding will be lost after dragging
+                    indicator.x = Qt.binding(function() { return checked ? handler.xAxis.maximum : handler.xAxis.minimum });
                 }
             }
         }
@@ -102,12 +105,7 @@ Rectangle {
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-            Connections {
-                function onClicked() {
-                    checked = !checked;
-                    clicked(checked)
-                }
-            }
+            onClicked: container.attemptToggle(!checked);
         }
     }
 }

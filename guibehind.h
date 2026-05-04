@@ -216,6 +216,7 @@ public Q_SLOTS:
     void showProfilePage();
     void selectAvatar();
     void resetBuddy();
+    bool canShowNotification(bool show);
     QString version();
 
 private Q_SLOTS:

@@ -259,7 +259,7 @@ Flickable {
             anchors.topMargin: 15
             text: "Enable notification"
             checked: guiBehind.showNotification
-            onClicked: guiBehind.showNotification = checked
+            onClicked: guiBehind.canShowNotification(checked)
         }
 
         CheckBox {

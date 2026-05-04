@@ -1,6 +1,12 @@
 QT += core gui network qml quickwidgets
 linux:!android:QT += dbus
 
+android: {
+    equals(QT_MAJOR_VERSION, 6) {
+        QT += core-private
+    }
+}
+
 #============Compiling Options=============
 
 # Allow only one instance

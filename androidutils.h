@@ -30,7 +30,7 @@ public:
     static bool hasExceptions();
 
 protected:
-    static QString getPackageName();
+    static QJniObject getPackageName();
     static QJniObject getSystemService(const QString &name);
     static QJniObject getContentResolver();
     static QJniObject getContext();
@@ -188,6 +188,8 @@ class AndroidNotification : public AndroidUtilsBase
 {
 public:
     AndroidNotification() = default;
+    static bool hasPermission(bool *explicitly);
+    static bool grantPermission();
     static void start(const QString &titleText, bool download);
     static void setProgress(int percent);
     static void setText(const QString &text);
@@ -197,6 +199,16 @@ public:
 
 private:
     static const char* javaClassPath;
+    static const char* permission;
+};
+
+/*============================================================*/
+
+class AndroidAppSettings : public AndroidUtilsBase
+{
+public:
+    AndroidAppSettings() = default;
+    static void openDetailsPage();
 };
 
 

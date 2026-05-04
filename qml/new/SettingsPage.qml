@@ -54,11 +54,7 @@ Flickable {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-                Connections {
-                    function onClicked() {
-                        settingsPage.back();
-                    }
-                }
+                onClicked: settingsPage.back();
             }
         }
 
@@ -310,10 +306,13 @@ Flickable {
             anchors.topMargin: 15
             text: "Enable notification"
             checked: guiBehind.showNotification
+            canToggle: function() {
+                return guiBehind.canShowNotification(!checked);
+            }
 
             Connections {
                 function onClicked(checked) {
-                    guiBehind.showNotification = checked
+                    guiBehind.showNotification = checked;
                 }
             }
         }

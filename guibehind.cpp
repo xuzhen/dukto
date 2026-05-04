@@ -959,13 +959,37 @@ QString GuiBehind::buddyAvatar() {
     }
 }
 
+bool GuiBehind::canShowNotification(bool show) {
+#ifdef Q_OS_ANDROID
+    bool explicitly;
+    if (show && AndroidNotification::hasPermission(&explicitly) == false) {
+        if (AndroidNotification::grantPermission() == false) {
+            if (explicitly) {
+                AndroidAppSettings::openDetailsPage();
+            }
+            return false;
+        }
+    }
+#else
+    Q_UNUSED(show)
+#endif
+    return true;
+}
+
 void GuiBehind::setShowNotification(bool show) {
     gSettings->saveNotificationEnabled(show);
     emit showNotificationChanged();
 }
 
 bool GuiBehind::showNotification() {
-    return gSettings->notificationEnabled();
+    bool v = gSettings->notificationEnabled();
+#ifdef Q_OS_ANDROID
+    if (v) {
+        bool explicitly;
+        v = AndroidNotification::hasPermission(&explicitly);
+    }
+#endif
+    return v;
 }
 
 void GuiBehind::setCloseToTray(bool enabled) {

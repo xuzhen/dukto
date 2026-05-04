@@ -26,8 +26,23 @@ Rectangle {
 
     property bool checked: false
     property alias text: label.text
+    property var canToggle: undefined
 
     signal clicked(bool checked)
+
+    function attemptToggle(targetChecked) {
+        if (targetChecked === checked) {
+            return;
+        }
+        if (canToggle !== undefined && typeof canToggle === "function") {
+            if (!canToggle(targetChecked)) {
+                return;
+            }
+        }
+        checked = targetChecked;
+        clicked(checked);
+    }
+
 
     Rectangle {
         id: checkbox
@@ -64,22 +79,13 @@ Rectangle {
             drag.maximumX: checkbox.width - indicator.width
             drag.onActiveChanged: {
                 if (!drag.active) {
-                    if (indicator.x >= (drag.maximumX - drag.minimumX) / 2) {
-                        indicator.x = drag.maximumX
-                        checked = true
-                        container.clicked(true)
-                    } else {
-                        indicator.x = drag.minimumX
-                        checked = false
-                        container.clicked(false)
-                    }
+                    attemptToggle(indicator.x >= (drag.maximumX - drag.minimumX) / 2)
+                    // binding will be lost after dragging
+                    indicator.x = Qt.binding(function() { return checked ? checkboxArea.drag.maximumX : checkboxArea.drag.minimumX });
                 }
             }
             onClicked: {
-                checked = !checked;
-                // walkaround a Qt bug: after dragging, the clicking won't change indicator.x
-                indicator.x = checked ? checkboxArea.drag.maximumX : checkboxArea.drag.minimumX
-                container.clicked(checked)
+                container.attemptToggle(!checked);
             }
         }
     }
@@ -98,10 +104,7 @@ Rectangle {
             hoverEnabled: true
             cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
             onClicked: {
-                checked = !checked;
-                // walkaround a Qt bug: after dragging, the clicking won't change indicator.x
-                indicator.x = checked ? checkboxArea.drag.maximumX : checkboxArea.drag.minimumX
-                container.clicked(checked)
+                container.attemptToggle(!checked);
             }
         }
     }

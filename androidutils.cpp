@@ -9,7 +9,7 @@
 typedef QAndroidJniEnvironment QJniEnvironment;
 #else
 #include <QJniEnvironment>
-#include <QFutureWatcher>
+#include <QtCore/private/qandroidextras_p.h>
 #endif
 
 #include <QUrl>
@@ -32,10 +32,10 @@ QString AndroidEnvironment::buildInfo(const QString &name) {
 /*============================================================*/
 
 
-QString AndroidUtilsBase::getPackageName() {
-    static QString packageName;
-    if (packageName.isEmpty()) {
-        packageName = getContext().callObjectMethod("getPackageName", "()Ljava/lang/String;").toString();
+QJniObject AndroidUtilsBase::getPackageName() {
+    static QJniObject packageName;
+    if (packageName.isValid() == false) {
+        packageName = getContext().callObjectMethod("getPackageName", "()Ljava/lang/String;");
     }
     return packageName;
 }
@@ -411,7 +411,7 @@ bool AndroidStorage::hasUriPermission(const QJniObject &uri, bool writable) {
 }
 
 void AndroidStorage::grantUriPermission(const QJniObject &uri, bool writable) {
-    getContext().callMethod<void>("grantUriPermission", "(Ljava/lang/String;Landroid/net/Uri;I)V", QJniObject::fromString(getPackageName()).object<jstring>(), uri.object(), (writable ? (FLAG_GRANT_READ_URI_PERMISSION | FLAG_GRANT_WRITE_URI_PERMISSION | FLAG_GRANT_PERSISTABLE_URI_PERMISSION) : (FLAG_GRANT_READ_URI_PERMISSION | FLAG_GRANT_PERSISTABLE_URI_PERMISSION)));
+    getContext().callMethod<void>("grantUriPermission", "(Ljava/lang/String;Landroid/net/Uri;I)V", getPackageName().object<jstring>(), uri.object(), (writable ? (FLAG_GRANT_READ_URI_PERMISSION | FLAG_GRANT_WRITE_URI_PERMISSION | FLAG_GRANT_PERSISTABLE_URI_PERMISSION) : (FLAG_GRANT_READ_URI_PERMISSION | FLAG_GRANT_PERSISTABLE_URI_PERMISSION)));
     getContentResolver().callMethod<void>("takePersistableUriPermission", "(Landroid/net/Uri;I)V", uri.object(), (writable ? (FLAG_GRANT_READ_URI_PERMISSION | FLAG_GRANT_WRITE_URI_PERMISSION) : FLAG_GRANT_READ_URI_PERMISSION));
     clearExceptions();
 }
@@ -818,6 +818,68 @@ void AndroidTheme::setSystemBarsNightMode(bool nightMode, QJniObject &decorView)
 /*============================================================*/
 
 const char* AndroidNotification::javaClassPath = "com/github/xuzhen/dukto/NotificationHelper";
+const char* AndroidNotification::permission = "android.permission.POST_NOTIFICATIONS";
+
+bool AndroidNotification::hasPermission(bool *explicitly) {
+    int ver = AndroidEnvironment::sdkVersion();
+    if (ver >= 33) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        QtAndroid::PermissionResult result = QtAndroid::checkPermission(permission);
+        *explicitly = false;
+        return (result == QtAndroid::PermissionResult::Granted);
+#else
+        auto checkResult = QtAndroidPrivate::checkPermission(permission);
+        checkResult.waitForFinished();
+        auto result = checkResult.result();
+        if (result == QtAndroidPrivate::PermissionResult::Authorized) {
+            *explicitly = true;
+            return true;
+        } else {
+            *explicitly = (result == QtAndroidPrivate::PermissionResult::Undetermined);
+            return false;
+        }
+#endif
+    } else if (ver >= 24) {
+        QJniObject notificationManager = getSystemService("notification");
+        if (notificationManager.isValid()) {
+            *explicitly = true;
+            // since API 24
+            return (notificationManager.callMethod<jboolean>("areNotificationsEnabled", "()Z") == JNI_TRUE);
+        }
+        *explicitly = false;
+        return false;
+    } else {
+        // API 19 ~ 23
+        QJniObject appOpsManager = getSystemService("appops");
+        if (appOpsManager.isValid()) {
+            QJniObject appInfo = getContext().callObjectMethod("getApplicationInfo", "()Landroid/content/pm/ApplicationInfo;");
+            jint uid = appInfo.getField<jint>("uid");
+            // hard code in android source code
+            jint OP_POST_NOTIFICATION = 11;
+            jint mode = appOpsManager.callMethod<jint>("checkOpNoThrow", "(IILjava/lang/String;)I", OP_POST_NOTIFICATION, uid, getPackageName().object<jstring>());
+            *explicitly = true;
+            // AppOpsManager.MODE_ALLOWED = 0
+            return mode == 0;
+        }
+        *explicitly = false;
+        return false;
+    }
+}
+
+bool AndroidNotification::grantPermission() {
+    if (AndroidEnvironment::sdkVersion() < 33) {
+        return false;
+    } else {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        QtAndroid::PermissionResultMap resultMap = QtAndroid::requestPermissionsSync(QStringList() << permission);
+        return (resultMap[permission] == QtAndroid::PermissionResult::Granted);
+#else
+        auto requestResult = QtAndroidPrivate::requestPermission(permission);
+        requestResult.waitForFinished();
+        return (requestResult.result() == QtAndroidPrivate::PermissionResult::Authorized);
+#endif
+    }
+}
 
 void AndroidNotification::start(const QString& title, bool download) {
     QJniObject jTitle = QJniObject::fromString(title);
@@ -846,5 +908,17 @@ void AndroidNotification::setDone(const QString &text) {
 void AndroidNotification::cancel() {
     QJniObject::callStaticMethod<void>(javaClassPath, "cancel");
 }
+
+/*============================================================*/
+
+void AndroidAppSettings::openDetailsPage() {
+    QJniObject scheme = QJniObject::fromString("package");
+    QJniObject uri = QJniObject::callStaticObjectMethod("android/net/Uri", "fromParts", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Landroid/net/Uri;", scheme.object<jstring>(), getPackageName().object<jstring>(), nullptr);
+    QJniObject action = QJniObject::fromString("android.settings.APPLICATION_DETAILS_SETTINGS");
+    QJniObject intent("android/content/Intent", "(Ljava/lang/String;)V", action.object<jstring>());
+    intent.callObjectMethod("setData", "(Landroid/net/Uri;)Landroid/content/Intent;", uri.object<jobject>());
+    getContext().callMethod<void>("startActivity", "(Landroid/content/Intent;)V", intent.object<jobject>());
+}
+
 
 #endif

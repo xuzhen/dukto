@@ -214,6 +214,12 @@ if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE Ws2_32 ole32 user32)
 endif()
 
+if(ANDROID)
+    if(QT_MAJOR_VERSION EQUAL 6)
+        target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::CorePrivate)
+    endif()
+endif()
+
 If (APPLE)
     set(MACOSX_BUNDLE_ICON_FILE dukto.icns)
     set_source_files_properties("dukto.icns" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
