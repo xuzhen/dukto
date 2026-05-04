@@ -23,7 +23,7 @@ Item {
     width: parent.width * 0.7
     implicitHeight: backRecangle.height
     clip: true
-    state: guiBehind.showUpdateBanner ? "showed" : "hidden"
+    state: (guiBehind.showUpdateBanner && (["","ip","progress"].indexOf(guiBehind.overlayState) >= 0)) ? "showed" : "hidden"
     visible: guiBehind.latestVersion !== ""
 
     Rectangle {
