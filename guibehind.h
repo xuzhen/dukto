@@ -129,6 +129,7 @@ public:
     QString initError();
     QString initErrorAction();
     QMargins screenPadding();
+    void initialize();
 
 protected:
     bool eventFilter(QObject *, QEvent *event) override;
@@ -192,32 +193,32 @@ public Q_SLOTS:
     void updateScreenPadding();
     void updateColorScheme(bool systemDarkMode);
 
+public:
     // Called by QML
-    void openDestinationFolder();
-    void refreshIpList();
-    void showTextSnippet(const QString &text, const QString &sender);
-    void openFile(const QString &path);
-    void changeDestinationFolder();
-    void showSendPage(const QString &ip);
-    void sendSomeFiles();
-    void sendFolder();
-    void sendClipboardText();
-    void sendText();
-    void sendScreen();
-    void changeThemeColor(const QString &color);
-    void abortTransfer();
-    bool isDesktopApp();
-    bool hasUpdater();
-    void initialize();
-    void reinitialize(const QString &action);
-    void refreshNeighbors();
-    void pasteDestinationIp();
-    void showProfilePage();
-    void selectAvatar();
-    void resetBuddy();
-    bool canShowNotification(bool show);
-    QString terms();
-    QString version();
+    Q_INVOKABLE void openDestinationFolder();
+    Q_INVOKABLE void refreshIpList();
+    Q_INVOKABLE void showTextSnippet(const QString &text, const QString &sender);
+    Q_INVOKABLE void openFile(const QString &path);
+    Q_INVOKABLE void changeDestinationFolder();
+    Q_INVOKABLE void showSendPage(const QString &ip);
+    Q_INVOKABLE void sendSomeFiles();
+    Q_INVOKABLE void sendFolder();
+    Q_INVOKABLE void sendClipboardText();
+    Q_INVOKABLE void sendText();
+    Q_INVOKABLE void sendScreen();
+    Q_INVOKABLE void changeThemeColor(const QString &color);
+    Q_INVOKABLE void abortTransfer();
+    Q_INVOKABLE bool isDesktopApp();
+    Q_INVOKABLE bool hasUpdater();
+    Q_INVOKABLE void reinitialize(const QString &action);
+    Q_INVOKABLE void refreshNeighbors();
+    Q_INVOKABLE void pasteDestinationIp();
+    Q_INVOKABLE void showProfilePage();
+    Q_INVOKABLE void selectAvatar();
+    Q_INVOKABLE void resetBuddy();
+    Q_INVOKABLE bool canShowNotification(bool show);
+    Q_INVOKABLE QString terms();
+    Q_INVOKABLE QString version();
 
 private Q_SLOTS:
     void showRandomBack();
