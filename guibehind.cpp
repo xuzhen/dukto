@@ -1236,6 +1236,14 @@ void GuiBehind::resetBuddy() {
     emit buddyNameChanged();
 }
 
+QString GuiBehind::terms() {
+    QFile f(":/LICENSE.txt");
+    if (f.open(QFile::ReadOnly | QFile::Text)) {
+        return QString::fromUtf8(f.readAll());
+    }
+    return "";
+}
+
 QString GuiBehind::version() {
     return QLatin1String(VERSION_TEXT);
 }

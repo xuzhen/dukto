@@ -1,0 +1,7 @@
+Title, ownership rights, and intellectual property rights in and to the Software shall remain with the author.
+
+The Software is provided on an "AS IS" basis, without warranty of any kind, express or implied, including without limitation the implied warranties of merchantability, fitness for a particular purpose, and non-infringement. The entire risk as to the quality and performance of the Software is borne by you. Should the Software prove defective, you, and not the author, assume the entire cost of any service and repair.
+
+You further acknowledge that the Software is intended solely for operation within a trusted Local Area Network (LAN) and that all data transmission is unencrypted.
+
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY CHARACTER INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF GOODWILL, WORK STOPPAGE, COMPUTER FAILURE OR MALFUNCTION, DATA LEAKS, UNAUTHORIZED DATA ACCESS, OR ANY AND ALL OTHER COMMERCIAL DAMAGES OR LOSSES.

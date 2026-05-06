@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>dukto.png</file>
+        <file>LICENSE.txt</file>
     </qresource>
 </RCC>
