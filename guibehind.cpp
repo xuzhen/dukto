@@ -114,22 +114,17 @@ GuiBehind::GuiBehind() : QObject(nullptr)
     mPeriodicHelloTimer = new QTimer(this);
     connect(mPeriodicHelloTimer, &QTimer::timeout, this, &GuiBehind::discoveryNeighbors);
 
-    // Setup protocol
-    initialize();
-
-    // Start random rotate
+    // Profile random rotate timer
     mShowBackTimer = new QTimer(this);
     connect(mShowBackTimer, &QTimer::timeout, this, &GuiBehind::showRandomBack);
 #if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
     qsrand(QDateTime::currentDateTimeUtc().toTime_t());
 #endif
-    mShowBackTimer->start(10000);
 
-#ifdef UPDATER
-    if (gSettings->autoCheckUpdates()) {
-        checkUpdates(false);
+    // Do nothing before accepting terms
+    if (showTermsOnStart() == false) {
+        initialize();
     }
-#endif
 
     qRegisterMetaType<QMargins>("QMargins");
 }
@@ -916,6 +911,9 @@ void GuiBehind::setShowTermsOnStart(bool show)
 {
     gSettings->saveShowTermsOnStart(show);
     emit showTermsOnStartChanged();
+    if (show == false) {
+        initialize();
+    }
 }
 
 bool GuiBehind::showUpdateBanner()
@@ -1154,6 +1152,13 @@ void GuiBehind::initialize() {
     // Say "hello"
     discoveryNeighbors();
     mPeriodicHelloTimer->start(60000);
+    mShowBackTimer->start(10000);
+
+#ifdef UPDATER
+    if (gSettings->autoCheckUpdates()) {
+        checkUpdates(false);
+    }
+#endif
 }
 
 void GuiBehind::reinitialize(const QString &action) {
