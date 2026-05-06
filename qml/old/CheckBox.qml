@@ -62,7 +62,7 @@ Rectangle {
             radius: height / 2
             x: checked ? checkboxArea.drag.maximumX : checkboxArea.drag.minimumX
             border.color: parent.border.color
-            border.width: 2
+            border.width: parent.border.width
 
             Behavior on x { SmoothedAnimation { duration: 200 } }
             Behavior on color { ColorAnimation { duration: 100 } }

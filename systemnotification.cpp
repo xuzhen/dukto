@@ -32,18 +32,18 @@ SystemNotification::~SystemNotification() {
 #endif
 }
 
-void SystemNotification::fileReceived(const QString &name, const QString &path, qint64 size) {
+void SystemNotification::notifyFileReceived(const QString &name, const QString &path, qint64 size) {
     Q_UNUSED(size)
     Q_UNUSED(path)
     notify("Recieved File", name);
 }
 
-void SystemNotification::folderReceived(const QString &name, const QString &path) {
+void SystemNotification::notifyFolderReceived(const QString &name, const QString &path) {
     Q_UNUSED(path)
     notify("Recieved Folder", name);
 }
 
-void SystemNotification::textReceived(const QString &text) {
+void SystemNotification::notifyTextReceived(const QString &text) {
     notify("Recieved Text Snippet", text);
 }
 
@@ -131,13 +131,6 @@ void SystemNotification::notifyTransferringItem(const QString &desc) {
 #endif
 }
 
-void SystemNotification::resetProgress() {
-#ifdef Q_OS_WIN
-    hideTaskbarProgress();
-#endif
-}
-
-
 void SystemNotification::notify(const QString &title, const QString &text) {
     if (!gSettings->notificationEnabled()) {
         return;
@@ -158,7 +151,14 @@ void SystemNotification::notify(const QString &title, const QString &text) {
 #endif
 }
 
+void SystemNotification::resetVisualEffects() {
 #ifdef Q_OS_WIN
+    hideTaskbarProgress();
+#endif
+}
+
+#ifdef Q_OS_WIN
+
 void SystemNotification::showTaskbarProgress(uint percent) {
     EcWin7 *taskbar = window->getTaskBar();
     if (taskbar != nullptr) {
@@ -180,4 +180,5 @@ void SystemNotification::stopTaskbarProgress() {
         taskbar->setProgressState(EcWin7::Error);
     }
 }
+
 #endif

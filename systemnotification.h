@@ -19,12 +19,12 @@ public:
     void notifyTransferringProgress(double percent);
     void notifyTransferringItem(const QString &desc);
 
-    void resetProgress();
+    void resetVisualEffects();
 
 public Q_SLOTS:
-    void fileReceived(const QString &name, const QString &path, qint64 size);
-    void folderReceived(const QString &name, const QString &path);
-    void textReceived(const QString &text);
+    void notifyFileReceived(const QString &name, const QString &path, qint64 size);
+    void notifyFolderReceived(const QString &name, const QString &path);
+    void notifyTextReceived(const QString &text);
 
 private:
     void notify(const QString &title, const QString &body);

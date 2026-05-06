@@ -22,8 +22,9 @@ Rectangle {
     color: "transparent"
     state: guiBehind.showTermsOnStart ? "termspage" : (guiBehind.initError !== "" ? "initerr" : "")
 
-    function refreshSettingsColor() {
+    onStateChanged: guiBehind.overlayState = state
 
+    function refreshSettingsColor() {
         settingsPage.refreshColor();
     }
 

@@ -108,6 +108,7 @@ GuiBehind::GuiBehind() : QObject(nullptr)
 
     // Register other signals
     connect(this, &GuiBehind::remoteDestinationAddressChanged, this, &GuiBehind::remoteDestinationAddressHandler);
+    connect(this, &GuiBehind::overlayStateChanged, this, &GuiBehind::overlayStateHandler);
 
     // Periodic "hello" timer
     mPeriodicHelloTimer = new QTimer(this);
@@ -162,9 +163,9 @@ void GuiBehind::setViewer(DuktoWindow *view) {
 #endif
 
     notifier = new SystemNotification(mView);
-    connect(&mDuktoProtocol, &DuktoProtocol::receiveTextCompleted, notifier, &SystemNotification::textReceived);
-    connect(&mDuktoProtocol, &DuktoProtocol::receiveFileCompleted, notifier, &SystemNotification::fileReceived);
-    connect(&mDuktoProtocol, &DuktoProtocol::receiveDirCompleted, notifier, &SystemNotification::folderReceived);
+    connect(&mDuktoProtocol, &DuktoProtocol::receiveTextCompleted, notifier, &SystemNotification::notifyTextReceived);
+    connect(&mDuktoProtocol, &DuktoProtocol::receiveFileCompleted, notifier, &SystemNotification::notifyFileReceived);
+    connect(&mDuktoProtocol, &DuktoProtocol::receiveDirCompleted, notifier, &SystemNotification::notifyFolderReceived);
 }
 
 // Add the new buddy to the buddy list
@@ -611,6 +612,16 @@ void GuiBehind::remoteDestinationAddressHandler()
     setTextSnippetBuddy(remoteDestinationAddress());
 }
 
+void GuiBehind::overlayStateHandler() {
+    static QString prevState;
+    QString curState = overlayState();
+    if (prevState == "message") {
+        // Reset taskbar progress status
+        notifier->resetVisualEffects();
+    }
+    prevState = curState;
+}
+
 // Returns true if the application is ready to accept
 // drag and drop for files to send
 bool GuiBehind::canAcceptDrop()
@@ -695,12 +706,6 @@ void GuiBehind::close()
     mDuktoProtocol.closeServers();
 }
 
-// Reset taskbar progress status
-void GuiBehind::resetProgressStatus()
-{
-    notifier->resetProgress();
-}
-
 // Broadcast hello
 void GuiBehind::discoveryNeighbors()
 {
@@ -723,7 +728,7 @@ void GuiBehind::abortTransfer()
 // Protocol confirms that abort has been done
 void GuiBehind::sendFileAborted()
 {
-    resetProgressStatus();
+    notifier->resetVisualEffects();
     emit gotoSendPage();
 }
 

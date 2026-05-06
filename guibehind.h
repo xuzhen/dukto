@@ -205,7 +205,6 @@ public Q_SLOTS:
     void sendText();
     void sendScreen();
     void changeThemeColor(const QString &color);
-    void resetProgressStatus();
     void abortTransfer();
     bool isDesktopApp();
     bool hasUpdater();
@@ -223,6 +222,7 @@ private Q_SLOTS:
     void showRandomBack();
     void clipboardChanged();
     void remoteDestinationAddressHandler();
+    void overlayStateHandler();
     void showUpdatesMessage(const QString &version);
     void sendScreenStage2();
     void discoveryNeighbors();

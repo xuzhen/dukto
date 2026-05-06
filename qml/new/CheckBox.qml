@@ -61,7 +61,7 @@ Rectangle {
             radius: height / 2
             x: checked ? handler.xAxis.maximum : handler.xAxis.minimum
             border.color: parent.border.color
-            border.width: 2
+            border.width: parent.border.width
 
             Behavior on x { SmoothedAnimation { duration: 200 } }
             Behavior on color { ColorAnimation { duration: 100 } }
