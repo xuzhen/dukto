@@ -66,7 +66,7 @@ mkdir build && cd build
 make
 ```
 
-* Build with Qt5 (requires JDK 8 and SDK 28~30):
+* Build with Qt5 (requires JDK 8, SDK platform 28~30 and NDK r21c/21.3.6528147):
 ```sh
 # if you want to specify SDK or build tools version, modify android/qt5/gradle.properties
 mkdir build && cd build
