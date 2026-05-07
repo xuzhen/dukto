@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
 If (APPLE)
     set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64")
 endif()
@@ -244,6 +244,27 @@ if(ANDROID)
             message(FATAL_ERROR "You need to set the ANDROID_NDK_ROOT environment variable to your Android NDK directory")
         endif()
         message(STATUS "Android NDK: ${ANDROID_NDK_ROOT}")
+
+        # other gradle properties
+        file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/android/qt5/gradle.properties" LINES)
+        foreach(line IN LISTS LINES)
+            if(line MATCHES "^androidCompileSdkVersion=(.*)$")
+                set(ANDROID_SDK_PLATFORM "android-${CMAKE_MATCH_1}")
+            elseif(line MATCHES "^androidBuildToolsVersion=(.*)$")
+                set(ANDROID_BUILD_TOOLS_REVISION "${CMAKE_MATCH_1}")
+            endif()
+        endforeach()
+
+        if(NOT ANDROID_SDK_PLATFORM)
+            message(FATAL_ERROR "androidCompileSdkVersion not found in gradle.properties")
+        else()
+            message(STATUS "Android SDK platform: ${ANDROID_SDK_PLATFORM}")
+        endif()
+        if(NOT ANDROID_BUILD_TOOLS_REVISION)
+            message(FATAL_ERROR "androidBuildToolsVersion not found in gradle.properties")
+        else()
+            message(STATUS "Android build tools version: ${ANDROID_BUILD_TOOLS_REVISION}")
+        endif()
     
         get_filename_component(QT_BINARY_ROOT "${Qt5Core_DIR}/../../../bin" ABSOLUTE)
     
@@ -259,6 +280,7 @@ if(ANDROID)
                 "-spec" "android-clang"
                 "CONFIG+=qtquickcompiler"
                 "ANDROID_ABIS=${ANDROID_ABI}"
+                "ANDROID_SDK_BUILD_TOOLS_REVISION=${ANDROID_BUILD_TOOLS_REVISION}"
             DEPENDS "${PROJECT_NAME}_apkdir"
             WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/apk"
             COMMENT "Generating APK configuration"
@@ -268,7 +290,8 @@ if(ANDROID)
             COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/apk/libs/${ANDROID_ABI}"
             COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libdukto.so" "${CMAKE_CURRENT_BINARY_DIR}/apk/libs/${ANDROID_ABI}/libDukto_${ANDROID_ABI}.so"
             COMMAND "${QT_BINARY_ROOT}/androiddeployqt"
-                --output "${CMAKE_CURRENT_BINARY_DIR}/apk"
+                --output "\"${CMAKE_CURRENT_BINARY_DIR}/apk\""
+                --android-platform "\"${ANDROID_SDK_PLATFORM}\""
                 --input android-Dukto-deployment-settings.json
                 --gradle
             DEPENDS "${PROJECT_NAME}_apkconf"

@@ -66,10 +66,12 @@ mkdir build && cd build
 make
 ```
 
-* Build with Qt5:
+* Build with Qt5 (requires JDK 8 and SDK 28~30):
 ```sh
+# if you want to specify SDK or build tools version, modify android/qt5/gradle.properties
 mkdir build && cd build
 export ANDROID_NDK_ROOT=/path/to/ndk ANDROID_SDK_ROOT=/path/to/sdk
+export JAVA_HOME=/path/to/jdk/8/home
 cmake -DCMAKE_SYSTEM_NAME=Android -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a -DQT_CMAKE_ROOT=/path/to/qt/cmake ..
 make
 ```
