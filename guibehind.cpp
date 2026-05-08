@@ -979,6 +979,10 @@ bool GuiBehind::canShowNotification(bool show) {
     return true;
 }
 
+void GuiBehind::setClipboardText(const QString &text) {
+    QApplication::clipboard()->setText(text);
+}
+
 void GuiBehind::setShowNotification(bool show) {
     gSettings->saveNotificationEnabled(show);
     emit showNotificationChanged();

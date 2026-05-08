@@ -217,6 +217,7 @@ public:
     Q_INVOKABLE void selectAvatar();
     Q_INVOKABLE void resetBuddy();
     Q_INVOKABLE bool canShowNotification(bool show);
+    Q_INVOKABLE void setClipboardText(const QString &text);
     Q_INVOKABLE QString terms();
     Q_INVOKABLE QString version();
 

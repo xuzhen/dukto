@@ -143,9 +143,7 @@ Rectangle {
             if (guiBehind.textSnippetSending)
                 textEditSnippet.paste();
             else {
-                if (textEditSnippet.selectedText === "")
-                    textEditSnippet.selectAll();
-                textEditSnippet.copy();
+                guiBehind.setClipboardText(textEditSnippet.selectedText ? textEditSnippet.selectedText : textEditSnippet.text);
             }
         }
     }
