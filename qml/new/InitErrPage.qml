@@ -88,7 +88,7 @@ Rectangle {
             text: guiBehind.initError
         }
 
-        ButtonDark {
+        Button {
             id: actionButton
             anchors.right: parent.right
             anchors.bottom: parent.bottom
