@@ -78,6 +78,5 @@ void UpdatesChecker::updatedDataReady(QNetworkReply *reply)
         }
     }
     emit checkEnd(success);
-    reply->manager()->deleteLater();
 }
 #endif
