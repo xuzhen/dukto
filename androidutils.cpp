@@ -736,13 +736,8 @@ QMargins AndroidScreenArea::getSystemBarsMargins() {
 #define UI_MODE_NIGHT_MASK                  48
 #define UI_MODE_NIGHT_YES                   32
 #define UI_MODE_NIGHT_NO                    16
-#define R_color_background_light            0x0106000f
-#define R_color_background_dark             0x0106000e
-#define APPEARANCE_LIGHT_NAVIGATION_BARS    16
-#define APPEARANCE_LIGHT_STATUS_BARS        8
-#define APPEARANCE_LIGHT_CAPTION_BARS       256
-#define SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR 16
-#define SYSTEM_UI_FLAG_LAYOUT_STABLE        256
+
+const char* AndroidTheme::javaClassPath = "com/github/xuzhen/dukto/NightModeHelper";
 
 bool AndroidTheme::isNightMode() {
     volatile bool r = false;
@@ -763,56 +758,10 @@ bool AndroidTheme::isNightMode() {
 }
 
 void AndroidTheme::setAppNightMode(bool nightMode) {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    auto code = [nightMode]() {
-        QJniObject decorView = getDecorView();
-        if (decorView.isValid() == false) {
-            return;
-        }
-        setDefaultNightMode(nightMode, decorView);
-        setSystemBarsNightMode(nightMode, decorView);
-    };
-    runOnAndroidThread(code);
-#else
-    Q_UNUSED(nightMode);
-#endif
-}
-
-void AndroidTheme::setDefaultNightMode(bool nightMode, QJniObject &decorView) {
-    QJniObject resources = getResources();
-    QJniObject conf = resources.callObjectMethod("getConfiguration", "()Landroid/content/res/Configuration;");
-    if (conf.isValid() == false) {
-        return;
-    }
-    jint uiMode = conf.getField<jint>("uiMode");
-    QJniObject newConf(conf);
-    uiMode = (nightMode ? UI_MODE_NIGHT_YES : UI_MODE_NIGHT_NO) | (uiMode & ~UI_MODE_NIGHT_MASK);
-    newConf.setField<jint>("uiMode", uiMode);
-    // FIXME: updateConfiguration deprecated since API level 25.
-    resources.callMethod<void>("updateConfiguration", "(Landroid/content/res/Configuration;Landroid/util/DisplayMetrics;)V", newConf.object(), nullptr);
-    decorView.callMethod<void>("dispatchConfigurationChanged", "(Landroid/content/res/Configuration;)V", newConf.object());
-}
-
-void AndroidTheme::setSystemBarsNightMode(bool nightMode, QJniObject &decorView) {
-    int ver = AndroidEnvironment::sdkVersion();
-    if (ver >= 30) {
-        QJniObject controller = decorView.callObjectMethod("getWindowInsetsController", "()Landroid/view/WindowInsetsController;");
-        if (controller.isValid() == false) {
-            return;
-        }
-        const jint mask = APPEARANCE_LIGHT_NAVIGATION_BARS | APPEARANCE_LIGHT_STATUS_BARS | APPEARANCE_LIGHT_CAPTION_BARS;
-        controller.callMethod<void>("setSystemBarsAppearance", "(II)V", static_cast<jint>(nightMode ? 0 : mask), mask);
-    } else if (ver >= 26) {
-        QJniObject window = getWindow();
-        QJniObject res = getResources();
-        if (window.isValid() == false || res.isValid() == false) {
-            return;
-        }
-        jint color = res.callMethod<jint>("getColor", "(ILandroid/content/res/Resources$Theme;)I", static_cast<jint>(nightMode ? R_color_background_dark : R_color_background_light), nullptr);
-        window.callMethod<void>("setNavigationBarColor", "(I)V", color);
-        window.callMethod<void>("setStatusBarColor", "(I)V", color);
-        decorView.callMethod<void>("setSystemUiVisibility", "(I)V", static_cast<jint>(nightMode ? SYSTEM_UI_FLAG_LAYOUT_STABLE : SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR));
-    }
+    runOnAndroidThread([nightMode]() {
+        QJniObject::callStaticMethod<void>(javaClassPath, "setNightMode", "(Landroid/view/Window;Z)V", getWindow().object(), static_cast<jboolean>(nightMode));
+        clearExceptions();
+    });
 }
 
 /*============================================================*/
