@@ -186,6 +186,28 @@ android {
     }
     ANDROID_VERSION_CODE = $$androidVersionCode($$VERSION)
 
+    contains(DEFINES, UPDATER) {
+        # modules/android_openssl/openssl.pri
+        !contains(QT.network_private.enabled_features, openssl-linked) {
+            CONFIG(release, debug|release) {
+                SSL_PATH = $${PWD}/modules/android_openssl
+            } else {
+                SSL_PATH = $${PWD}/modules/android_openssl/no-asm
+            }
+            if (versionAtLeast(QT_VERSION, 6.5.0)) {
+                SSL_VER = 3
+            } else {
+                SSL_VER = 1.1
+            }
+            arch = $$ANDROID_ABIS
+            isEmpty(arch): arch = $$ANDROID_TARGET_ARCH
+            for (abi, $$list($$split(arch, " "))) {
+                ANDROID_EXTRA_LIBS += $${SSL_PATH}/ssl_$${SSL_VER}/$${abi}/libcrypto_$$replace(SSL_VER,"\.","_").so
+                ANDROID_EXTRA_LIBS += $${SSL_PATH}/ssl_$${SSL_VER}/$${abi}/libssl_$$replace(SSL_VER,"\.","_").so
+            }
+        }
+    }
+
     greaterThan(QT_MAJOR_VERSION, 5) {
         ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android/qt6
         OTHER_FILES += $$PWD/android/qt6/AndroidManifest.xml

@@ -362,6 +362,11 @@ if(ANDROID)
             QT_ANDROID_VERSION_CODE "${ver_code}"
             QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android/qt6"
         )
+
+        if(ANDROID AND USE_UPDATER)
+            include("${CMAKE_CURRENT_SOURCE_DIR}/modules/android_openssl/android_openssl.cmake")
+            add_android_openssl_libraries(dukto)
+        endif(ANDROID AND USE_UPDATER)
     endif()
 endif(ANDROID)
 

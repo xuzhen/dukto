@@ -1,3 +1,6 @@
 [submodule "modules/SingleApplication"]
 	path = modules/SingleApplication
 	url = https://github.com/itay-grudev/SingleApplication.git
+[submodule "modules/android_openssl"]
+	path = modules/android_openssl
+	url = https://github.com/KDAB/android_openssl.git
