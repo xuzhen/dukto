@@ -154,7 +154,7 @@ android {
     TARGET = Dukto
 
     lessThan(QT_MAJOR_VERSION, 6) {
-        ANDROID_MIN_SDK_VERSION = 21
+        ANDROID_MIN_SDK_VERSION = 23
     } else {
         ANDROID_MIN_SDK_VERSION = 26
     }

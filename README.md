@@ -29,7 +29,7 @@ APKs can be downloaded from [the releases page](https://github.com/xuzhen/dukto/
 
 The `dukto_*_qt6.apk` supports Android 8.0 (Oreo) and later.
 
-The `dukto_*_qt5.apk` supports Android 5.0 (Lollipop) and later.
+The `dukto_*_qt5.apk` supports Android 6.0 (Marshmallow) and later.
 
 #### Ubuntu and derivatives:
 Use [this PPA](https://launchpad.net/~xuzhen666/+archive/ubuntu/dukto) 
