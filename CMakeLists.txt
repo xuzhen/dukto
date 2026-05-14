@@ -269,12 +269,17 @@ if(ANDROID)
         else()
             message(STATUS "Android build tools version: ${ANDROID_BUILD_TOOLS_REVISION}")
         endif()
+        
+        if(CMAKE_BUILD_TYPE STREQUAL "Release")
+			set(EXTRA_QMAKE_ARGS "CONFIG+=release")
+            set(EXTRA_ANDROIDDEPLOYQT_ARGS "--release")
+        endif()
     
         get_filename_component(QT_BINARY_ROOT "${Qt5Core_DIR}/../../../bin" ABSOLUTE)
     
         add_custom_target("${PROJECT_NAME}_apkdir"
-            COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_CURRENT_BINARY_DIR}/apk"
-            COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/apk"
+            COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_CURRENT_BINARY_DIR}/android-build"
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/android-build"
             DEPENDS "${PROJECT_NAME}"
             COMMENT "Preparing APK directory"
         )
@@ -285,21 +290,23 @@ if(ANDROID)
                 "CONFIG+=qtquickcompiler"
                 "ANDROID_ABIS=${ANDROID_ABI}"
                 "ANDROID_SDK_BUILD_TOOLS_REVISION=${ANDROID_BUILD_TOOLS_REVISION}"
+                ${EXTRA_QMAKE_ARGS}
             DEPENDS "${PROJECT_NAME}_apkdir"
-            WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/apk"
+            WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/android-build"
             COMMENT "Generating APK configuration"
         )
         add_custom_target(apk ALL
-            COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_CURRENT_BINARY_DIR}/apk/libs/${ANDROID_ABI}"
-            COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/apk/libs/${ANDROID_ABI}"
-            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libdukto.so" "${CMAKE_CURRENT_BINARY_DIR}/apk/libs/${ANDROID_ABI}/libDukto_${ANDROID_ABI}.so"
+            COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_CURRENT_BINARY_DIR}/android-build/libs/${ANDROID_ABI}"
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/android-build/libs/${ANDROID_ABI}"
+            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libdukto.so" "${CMAKE_CURRENT_BINARY_DIR}/android-build/libs/${ANDROID_ABI}/libDukto_${ANDROID_ABI}.so"
             COMMAND "${QT_BINARY_ROOT}/androiddeployqt"
-                --output "\"${CMAKE_CURRENT_BINARY_DIR}/apk\""
+                --output "\"${CMAKE_CURRENT_BINARY_DIR}/android-build\""
                 --android-platform "\"${ANDROID_SDK_PLATFORM}\""
                 --input android-Dukto-deployment-settings.json
                 --gradle
+                ${EXTRA_ANDROIDDEPLOYQT_ARGS}
             DEPENDS "${PROJECT_NAME}_apkconf"
-            WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/apk"
+            WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/android-build"
             COMMENT "Generating APK"
         )
     elseif(QT_MAJOR_VERSION EQUAL 6)
