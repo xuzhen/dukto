@@ -27,7 +27,6 @@
 #include <QDir>
 #include <QNetworkInterface>
 #include <QNetworkProxy>
-#include <QTimer>
 
 #include "network/messenger.h"
 #include "network/receiver.h"

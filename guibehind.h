@@ -236,7 +236,7 @@ private:
     QTimer *mPeriodicHelloTimer = nullptr;
     MiniWebServer *mMiniWebServer = nullptr;
     DestinationBuddy *mDestBuddy = nullptr;
-    SystemNotification *notifier = nullptr;
+    SystemNotification *mNotifier = nullptr;
     BuddyListItemModel mBuddiesList;
     RecentListItemModel mRecentList;
     IpAddressItemModel mIpAddresses;

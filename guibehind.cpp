@@ -135,7 +135,7 @@ GuiBehind::~GuiBehind()
     if (mShowBackTimer) mShowBackTimer->deleteLater();
     if (mPeriodicHelloTimer) mPeriodicHelloTimer->deleteLater();
     if (mDestBuddy) mDestBuddy->deleteLater();
-    if (notifier) notifier->deleteLater();
+    if (mNotifier) mNotifier->deleteLater();
 }
 
 void GuiBehind::setViewer(DuktoWindow *view) {
@@ -157,10 +157,10 @@ void GuiBehind::setViewer(DuktoWindow *view) {
     view->showMaximized();
 #endif
 
-    notifier = new SystemNotification(mView);
-    connect(&mDuktoProtocol, &DuktoProtocol::receiveTextCompleted, notifier, &SystemNotification::notifyTextReceived);
-    connect(&mDuktoProtocol, &DuktoProtocol::receiveFileCompleted, notifier, &SystemNotification::notifyFileReceived);
-    connect(&mDuktoProtocol, &DuktoProtocol::receiveDirCompleted, notifier, &SystemNotification::notifyFolderReceived);
+    mNotifier = new SystemNotification(mView);
+    connect(&mDuktoProtocol, &DuktoProtocol::receiveTextCompleted, mNotifier, &SystemNotification::notifyTextReceived);
+    connect(&mDuktoProtocol, &DuktoProtocol::receiveFileCompleted, mNotifier, &SystemNotification::notifyFileReceived);
+    connect(&mDuktoProtocol, &DuktoProtocol::receiveDirCompleted, mNotifier, &SystemNotification::notifyFolderReceived);
 }
 
 // Add the new buddy to the buddy list
@@ -222,7 +222,7 @@ void GuiBehind::receiveFileStart(const QString &senderIp)
     // Update user interface
     setCurrentTransferSending(false);
 
-    notifier->notifyTransferringStarted(true, sender, senderIp);
+    mNotifier->notifyTransferringStarted(true, sender, senderIp);
 
     emit transferStart();
 }
@@ -240,14 +240,14 @@ void GuiBehind::transferStatusUpdate(qint64 total, qint64 partial)
     double percent = partial * 1.0 / total * 100;
     setCurrentTransferProgress(percent);
 
-    notifier->notifyTransferringProgress(percent);
+    mNotifier->notifyTransferringProgress(percent);
 }
 
 void GuiBehind::transferItemUpdate(qint64 total, qint64 current, const QString &name) {
     const static QString textTemplate = QStringLiteral("(%1 / %2)  %3");
     QString text = textTemplate.arg(current).arg(total).arg(name);
     setCurrentTransferItem(text);
-    notifier->notifyTransferringItem(text);
+    mNotifier->notifyTransferringItem(text);
 }
 
 void GuiBehind::receiveFileComplete(const QString &name, const QString &path, qint64 size) {
@@ -268,7 +268,7 @@ void GuiBehind::receiveTextComplete(const QString &text) {
 void GuiBehind::receiveComplete() {
     // Update GUI
     QApplication::alert(mView, 5000);
-    notifier->notifyTransferringCompleted(true);
+    mNotifier->notifyTransferringCompleted(true);
     emit receiveCompleted();
 }
 
@@ -558,7 +558,7 @@ bool GuiBehind::prepareStartTransfer(QString *ip, qint16 *port)
             *port = 0;
         }
         setCurrentTransferBuddy(*ip);
-        notifier->notifyTransferringStarted(false, *ip, "");
+        mNotifier->notifyTransferringStarted(false, *ip, "");
     }
     else {
 
@@ -566,7 +566,7 @@ bool GuiBehind::prepareStartTransfer(QString *ip, qint16 *port)
         *ip = mDestBuddy->ip();
         *port = mDestBuddy->port();
         setCurrentTransferBuddy(mDestBuddy->username());
-        notifier->notifyTransferringStarted(false, mDestBuddy->username(), *ip);
+        mNotifier->notifyTransferringStarted(false, mDestBuddy->username(), *ip);
     }
 
     // Update GUI for file transfer
@@ -589,7 +589,7 @@ void GuiBehind::sendFileComplete()
 #endif
     setMessagePageBackState("send");
 
-    notifier->notifyTransferringCompleted(false);
+    mNotifier->notifyTransferringCompleted(false);
     // Check for temporary file to delete
     if (!mScreenTempPath.isEmpty()) {
 
@@ -611,7 +611,7 @@ void GuiBehind::overlayStateHandler() {
     static QString prevState, pprevState;
     QString curState = overlayState();
     if (prevState == "message" && pprevState == "progress") {
-        notifier->hideNotification();
+        mNotifier->hideNotification();
     }
     pprevState = prevState;
     prevState = curState;
@@ -650,7 +650,7 @@ void GuiBehind::sendFileError(const QString &error)
     setMessagePageText(errorText);
     setMessagePageBackState("send");
 
-    notifier->notifyTransferringError(false, error);
+    mNotifier->notifyTransferringError(false, error);
 
     // Check for temporary file to delete
     if (!mScreenTempPath.isEmpty()) {
@@ -675,7 +675,7 @@ void GuiBehind::receiveFileCancelled(const QString &error)
         // no reason, cancelled by user
         emit receiveCompleted();
     }
-    notifier->notifyTransferringError(true, error);
+    mNotifier->notifyTransferringError(true, error);
 }
 
 // Event handler to catch the "application activate" event
@@ -723,7 +723,7 @@ void GuiBehind::abortTransfer()
 // Protocol confirms that abort has been done
 void GuiBehind::sendFileAborted()
 {
-    notifier->hideNotification();
+    mNotifier->hideNotification();
     emit gotoSendPage();
 }
 

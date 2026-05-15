@@ -19,7 +19,6 @@
 #include "sender.h"
 #include <QTcpSocket>
 #include <QNetworkProxy>
-#include <QTimer>
 
 QByteArray Sender::textElementName = QStringLiteral("___DUKTO___TEXT___").toUtf8();
 
