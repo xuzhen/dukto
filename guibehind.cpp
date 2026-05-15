@@ -619,6 +619,14 @@ void GuiBehind::overlayStateHandler() {
     if (prevState == "message" && pprevState == "progress") {
         mNotifier->hideNotification();
     }
+#ifdef Q_OS_ANDROID
+    if (prevState == "progress") {
+        if (mWakeLock != nullptr) {
+            delete mWakeLock;
+            mWakeLock = nullptr;
+        }
+    }
+#endif
     pprevState = prevState;
     prevState = curState;
 }
@@ -1321,5 +1329,20 @@ void GuiBehind::appStateHandler(Qt::ApplicationState state) {
         mPeriodicHelloTimer->start();
         mShowBackTimer->start();
     }
+#ifdef Q_OS_ANDROID
+    if (blockActivity) {
+        if (overlayState() == "progress") {
+            if (mWakeLock == nullptr) {
+                mWakeLock = new AndroidWakeLock();
+            }
+            mWakeLock->acquire();
+        }
+    } else {
+        if (mWakeLock != nullptr) {
+            delete mWakeLock;
+            mWakeLock = nullptr;
+        }
+    }
+#endif
 }
 

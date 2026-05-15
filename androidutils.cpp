@@ -191,6 +191,37 @@ void AndroidMulticastLock::release() {
     }
     lock.callMethod<void>("release", "()V");
 }
+/*============================================================*/
+
+AndroidWakeLock::AndroidWakeLock() {
+    QJniObject powerManager = getSystemService("power");
+    if (powerManager.isValid()) {
+        // 1 = PowerManager.PARTIAL_WAKE_LOCK
+        lock = powerManager.callObjectMethod("newWakeLock", "(ILjava/lang/String;)Landroid/os/PowerManager$WakeLock;", static_cast<jint>(1), QJniObject::fromString("Dukto").object<jstring>());
+    }
+}
+
+AndroidWakeLock::~AndroidWakeLock() {
+    release();
+}
+
+bool AndroidWakeLock::acquire() {
+    if (lock.isValid() == false) {
+        return false;
+    }
+    if (lock.callMethod<jboolean>("isHeld", "()Z")) {
+        return true;
+    }
+    lock.callMethod<void>("acquire", "()V");
+    return lock.callMethod<jboolean>("isHeld", "()Z");
+}
+
+void AndroidWakeLock::release() {
+    if (lock.isValid() == false || !lock.callMethod<jboolean>("isHeld", "()Z")) {
+        return;
+    }
+    lock.callMethod<void>("release", "()V");
+}
 
 /*============================================================*/
 

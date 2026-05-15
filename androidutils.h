@@ -73,6 +73,19 @@ private:
 
 /*============================================================*/
 
+class AndroidWakeLock : public AndroidUtilsBase
+{
+public:
+    AndroidWakeLock();
+    ~AndroidWakeLock();
+    bool acquire();
+    void release();
+private:
+    QJniObject lock;
+};
+
+/*============================================================*/
+
 class AndroidScreenOn : public AndroidUtilsBase
 {
 public:

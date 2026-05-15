@@ -32,6 +32,10 @@ class MiniWebServer;
 class DuktoWindow;
 class SystemNotification;
 
+#ifdef Q_OS_ANDROID
+class AndroidWakeLock;
+#endif
+
 class GuiBehind : public QObject
 {
     Q_OBJECT
@@ -238,6 +242,9 @@ private:
     MiniWebServer *mMiniWebServer = nullptr;
     DestinationBuddy *mDestBuddy = nullptr;
     SystemNotification *mNotifier = nullptr;
+#ifdef Q_OS_ANDROID
+    AndroidWakeLock *mWakeLock = nullptr;
+#endif
     BuddyListItemModel mBuddiesList;
     RecentListItemModel mRecentList;
     IpAddressItemModel mIpAddresses;
