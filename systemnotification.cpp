@@ -151,7 +151,10 @@ void SystemNotification::notify(const QString &title, const QString &text) {
 #endif
 }
 
-void SystemNotification::resetVisualEffects() {
+void SystemNotification::hideNotification() {
+#ifdef Q_OS_ANDROID
+    AndroidNotification::cancel();
+#endif
 #ifdef Q_OS_WIN
     hideTaskbarProgress();
 #endif

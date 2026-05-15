@@ -19,7 +19,7 @@ public:
     void notifyTransferringProgress(double percent);
     void notifyTransferringItem(const QString &desc);
 
-    void resetVisualEffects();
+    void hideNotification();
 
 public Q_SLOTS:
     void notifyFileReceived(const QString &name, const QString &path, qint64 size);

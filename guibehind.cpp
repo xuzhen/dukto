@@ -608,12 +608,12 @@ void GuiBehind::remoteDestinationAddressHandler()
 }
 
 void GuiBehind::overlayStateHandler() {
-    static QString prevState;
+    static QString prevState, pprevState;
     QString curState = overlayState();
-    if (prevState == "message") {
-        // Reset taskbar progress status
-        notifier->resetVisualEffects();
+    if (prevState == "message" && pprevState == "progress") {
+        notifier->hideNotification();
     }
+    pprevState = prevState;
     prevState = curState;
 }
 
@@ -723,7 +723,7 @@ void GuiBehind::abortTransfer()
 // Protocol confirms that abort has been done
 void GuiBehind::sendFileAborted()
 {
-    notifier->resetVisualEffects();
+    notifier->hideNotification();
     emit gotoSendPage();
 }
 
