@@ -31,6 +31,7 @@
 #include <QDragLeaveEvent>
 #include <QDropEvent>
 #include <QMimeData>
+#include <QQuickItem>
 
 #ifdef Q_OS_MAC
 #include <objc/objc.h>
@@ -119,6 +120,12 @@ EcWin7 *DuktoWindow::getTaskBar() {
     return mWin7;
 }
 #endif
+
+void DuktoWindow::setContentUpdates(bool enable) {
+    setUpdatesEnabled(enable);
+    // force a redrawing, avoid crashes on Android
+    quickWindow()->contentItem()->setOpacity(enable ? 1.0 : 0.0);
+}
 
 void DuktoWindow::activateWindow() {
     showNormal();

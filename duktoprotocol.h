@@ -51,6 +51,7 @@ public:
     void abortCurrentTransfer();
     void updateBuddy();
     void setDestDir(const QString &dir);
+    void blockInbound(bool block);
     
 private Q_SLOTS:
     void newIncomingConnection();
@@ -81,6 +82,8 @@ private:
     qint16 mLocalTcpPort;
 
     QString mDestDir;
+
+    bool mBlocked = false;
 };
 
 #endif // DUKTOPROTOCOL_H

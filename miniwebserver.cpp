@@ -49,12 +49,21 @@ void MiniWebServer::restart() {
     }
 }
 
+void MiniWebServer::blockInbound(bool blocked) {
+    mBlocked = blocked;
+}
+
 void MiniWebServer::incomingConnection(qintptr handle)
 {
     QTcpSocket* s = new QTcpSocket(this);
+    s->setSocketDescriptor(handle);
+    if (mBlocked) {
+        s->abort();
+        s->deleteLater();
+        return;
+    }
     connect(s, &QTcpSocket::readyRead, this, &MiniWebServer::readClient);
     connect(s, &QTcpSocket::disconnected, s, &QTcpSocket::deleteLater);
-    s->setSocketDescriptor(handle);
 }
 
 void MiniWebServer::readClient()

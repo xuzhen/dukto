@@ -46,6 +46,8 @@ public:
     void sayHello(const QHostAddress &target, quint16 port);
     void sayGoodbye();
 
+    void blockInbound(bool block);
+
 Q_SIGNALS:
     void buddyFound(Peer peer);
     void buddyGone(Peer peer);
@@ -69,6 +71,8 @@ private:
 
     // on Android, an interface created by some VPN apps may cause broadcast storm
     QList<QHostAddress> badAddrs;
+
+    bool blocked = false;
 
 #ifdef Q_OS_ANDROID
     AndroidMulticastLock *lock = nullptr;

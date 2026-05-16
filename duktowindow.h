@@ -43,6 +43,7 @@ public:
 #ifdef Q_OS_WIN
     EcWin7 *getTaskBar();
 #endif
+    void setContentUpdates(bool enable);
 
 public Q_SLOTS:
     void activateWindow();

@@ -114,8 +114,9 @@ void DuktoProtocol::newIncomingConnection()
     QTcpSocket* s = mTcpServer->nextPendingConnection();
     if(s == nullptr) return;
 
-    if (mReceiver != nullptr || mSender != nullptr) {
-        s->close();
+    if (mReceiver != nullptr || mSender != nullptr || mBlocked) {
+        s->abort();
+        s->deleteLater();
         return;
     }
 
@@ -227,4 +228,11 @@ void DuktoProtocol::setDestDir(const QString &dir) {
         mDestDir.append(QChar('/'));
     }
 #endif
+}
+
+void DuktoProtocol::blockInbound(bool block) {
+    mBlocked = block;
+    if (mMessenger != nullptr) {
+        mMessenger->blockInbound(block);
+    }
 }

@@ -89,6 +89,13 @@ void Messenger::stop() {
 }
 
 void Messenger::processDatagram() {
+    if (blocked) {
+        while (socket->hasPendingDatagrams()) {
+            // discards the datagram
+            socket->readDatagram(nullptr, 0);
+        }
+        return;
+    }
     QByteArray datagram;
     qint64 size;
     while ((size = socket->pendingDatagramSize()) > 0) {
@@ -174,6 +181,10 @@ void Messenger::sayGoodbye() {
         return;
     }
     broadcastMessage(BuddyMessage::goodbye());
+}
+
+void Messenger::blockInbound(bool block) {
+    blocked = block;
 }
 
 // Send message from all interfaces

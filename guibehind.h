@@ -229,6 +229,7 @@ private Q_SLOTS:
     void showUpdatesMessage(const QString &version);
     void sendScreenStage2();
     void discoveryNeighbors();
+    void appStateHandler(Qt::ApplicationState state);
 
 private:
     DuktoWindow *mView = nullptr;
@@ -273,6 +274,7 @@ private:
 #ifdef UPDATER
     void checkUpdates(bool forceCheck);
 #endif
+    void setInboundBlocked(bool blocked);
 };
 
 #endif // GUIBEHIND_H

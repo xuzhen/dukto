@@ -30,6 +30,7 @@ class MiniWebServer : public QTcpServer
 public:
     MiniWebServer(quint16 port);
     void restart();
+    void blockInbound(bool blocked);
 
 protected:
     void incomingConnection(qintptr handle) override;
@@ -40,6 +41,7 @@ private Q_SLOTS:
 private:
      quint16 port;
      QByteArray mAvatarData;
+     bool mBlocked;
 
 };
 

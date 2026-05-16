@@ -112,10 +112,12 @@ GuiBehind::GuiBehind() : QObject(nullptr)
 
     // Periodic "hello" timer
     mPeriodicHelloTimer = new QTimer(this);
+    mPeriodicHelloTimer->setInterval(60000);
     connect(mPeriodicHelloTimer, &QTimer::timeout, this, &GuiBehind::discoveryNeighbors);
 
     // Profile random rotate timer
     mShowBackTimer = new QTimer(this);
+    mShowBackTimer->setInterval(10000);
     connect(mShowBackTimer, &QTimer::timeout, this, &GuiBehind::showRandomBack);
 #if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
     qsrand(QDateTime::currentDateTimeUtc().toTime_t());
@@ -161,6 +163,10 @@ void GuiBehind::setViewer(DuktoWindow *view) {
     connect(&mDuktoProtocol, &DuktoProtocol::receiveTextCompleted, mNotifier, &SystemNotification::notifyTextReceived);
     connect(&mDuktoProtocol, &DuktoProtocol::receiveFileCompleted, mNotifier, &SystemNotification::notifyFileReceived);
     connect(&mDuktoProtocol, &DuktoProtocol::receiveDirCompleted, mNotifier, &SystemNotification::notifyFolderReceived);
+
+#ifdef Q_OS_ANDROID
+    connect(qApp, &QGuiApplication::applicationStateChanged, this, &GuiBehind::appStateHandler);
+#endif
 }
 
 // Add the new buddy to the buddy list
@@ -1155,8 +1161,8 @@ void GuiBehind::initialize() {
     setInitError(QString(""));
     // Say "hello"
     discoveryNeighbors();
-    mPeriodicHelloTimer->start(60000);
-    mShowBackTimer->start(10000);
+    mPeriodicHelloTimer->start();
+    mShowBackTimer->start();
 
 #ifdef UPDATER
     if (gSettings->autoCheckUpdates()) {
@@ -1302,3 +1308,18 @@ void GuiBehind::checkUpdates(bool forceCheck) {
 #endif
 }
 #endif
+
+void GuiBehind::appStateHandler(Qt::ApplicationState state) {
+    bool blockActivity = (state == Qt::ApplicationSuspended || state == Qt::ApplicationHidden);
+    mView->setContentUpdates(!blockActivity);
+    mDuktoProtocol.blockInbound(blockActivity);
+    mMiniWebServer->blockInbound(blockActivity);
+    if (blockActivity) {
+        mPeriodicHelloTimer->stop();
+        mShowBackTimer->stop();
+    } else {
+        mPeriodicHelloTimer->start();
+        mShowBackTimer->start();
+    }
+}
+
