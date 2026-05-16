@@ -78,6 +78,7 @@ void Theme::setDarkMode(bool darkMode) {
         mBorderColor = "#444444";
         mDisabledColor = "#666666";
         mInactiveTextColor = "#555555";
+        mOverlayColor = "#333333";
     } else {
         mTextColor = "#555555";
         mDimmedTextColor = "#888888";
@@ -87,6 +88,7 @@ void Theme::setDarkMode(bool darkMode) {
         mBorderColor = "#d0d0d0";
         mDisabledColor = "#cccccc";
         mInactiveTextColor = "#bbbbbb";
+        mOverlayColor = "#ffffff";
     }
     mDarkMode = darkMode;
 
@@ -98,6 +100,7 @@ void Theme::setDarkMode(bool darkMode) {
     emit borderColorChanged();
     emit inactiveTextColorChanged();
     emit disabledColorChanged();
+    emit overlayColorChanged();
 }
 
 float Theme::getHue(const QString &color) {

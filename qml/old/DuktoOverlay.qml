@@ -31,7 +31,7 @@ Rectangle {
     Rectangle {
         id: disabler
         anchors.fill: parent
-        color: guiBehind.darkMode ? "#333333" : "#ffffff"
+        color: theme.overlayColor
         opacity: 0
         visible: false
 

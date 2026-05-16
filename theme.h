@@ -43,6 +43,8 @@ class Theme : public QObject
     Q_PROPERTY(QString borderColor READ borderColor NOTIFY borderColorChanged)
     Q_PROPERTY(QString disabledColor READ disabledColor NOTIFY disabledColorChanged)
 
+    Q_PROPERTY(QString overlayColor READ overlayColor NOTIFY overlayColorChanged)
+
 public:
     explicit Theme(QObject *parent = nullptr);
     inline QString themeColor() { return mThemeColor; }
@@ -59,6 +61,7 @@ public:
     inline QString darkerBgColor() { return mDarkerBgColor; }
     inline QString borderColor() { return mBorderColor; }
     inline QString disabledColor() { return mDisabledColor; }
+    inline QString overlayColor() { return mOverlayColor; }
 
     inline bool darkMode() { return mDarkMode; }
     void setDarkMode(bool darkMode);
@@ -82,6 +85,7 @@ Q_SIGNALS:
     void darkerBgColorChanged();
     void borderColorChanged();
     void disabledColorChanged();
+    void overlayColorChanged();
 
 public Q_SLOTS:
     float getHue(const QString &color);
@@ -103,6 +107,7 @@ private:
     QString mDarkerBgColor;
     QString mBorderColor;
     QString mDisabledColor;
+    QString mOverlayColor;
     bool mDarkMode = false;
 };
 
