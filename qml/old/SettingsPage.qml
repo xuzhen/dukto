@@ -19,7 +19,7 @@
 import QtQuick 2.3
 
 Flickable {
-    property var lastItem: uswitch
+    property var lastItem: guiBehind.hasUpdater() ? uswitch : (guiBehind.isDesktopApp() ? cswitch : nswitch)
 
     id: settingsPage
     interactive: (lastItem.y + lastItem.height + 20) > height
