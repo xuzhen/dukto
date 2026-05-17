@@ -900,5 +900,58 @@ void AndroidAppSettings::openDetailsPage() {
     getContext().callMethod<void>("startActivity", "(Landroid/content/Intent;)V", intent.object<jobject>());
 }
 
+/*============================================================*/
+
+AndroidIntentReceiver::AndroidIntentReceiver(QObject *parent) : QObject(parent) {
+}
+
+AndroidIntentReceiver& AndroidIntentReceiver::instance() {
+    static AndroidIntentReceiver theOne;
+    return theOne;
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_github_xuzhen_dukto_MainActivity_onFileShared(JNIEnv *env, jobject /*obj*/, jstring uriString) {
+    const char *uriChars = env->GetStringUTFChars(uriString, nullptr);
+    QString uri = QString::fromUtf8(uriChars);
+    env->ReleaseStringUTFChars(uriString, uriChars);
+    qDebug() << "received file:" << uri;
+    emit AndroidIntentReceiver::instance().fileReceived(uri);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_github_xuzhen_dukto_MainActivity_onMultipleFilesShared(JNIEnv *env, jobject /*obj*/, jobjectArray uriArray) {
+    if (!uriArray) {
+        return;
+    }
+    int length = env->GetArrayLength(uriArray);
+    qDebug() << "received" << length << "files:";
+    QStringList list;
+    for (int i = 0; i < length; i++) {
+        jstring jUriString = (jstring) env->GetObjectArrayElement(uriArray, i);
+        if (!jUriString) {
+            continue;
+        }
+        const char *uriChars = env->GetStringUTFChars(jUriString, nullptr);
+        QString uri = QString::fromUtf8(uriChars);
+        env->ReleaseStringUTFChars(jUriString, uriChars);
+        env->DeleteLocalRef(jUriString);
+        qDebug() << "  [" << i + 1 << "]" << uri;
+        list << uri;
+    }
+    emit AndroidIntentReceiver::instance().filesReceived(list);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_github_xuzhen_dukto_MainActivity_onTextShared(JNIEnv *env, jobject /*obj*/, jstring textString) {
+    if (!textString) {
+        return;
+    }
+    const char *textChars = env->GetStringUTFChars(textString, nullptr);
+    QString sharedText = QString::fromUtf8(textChars);
+    env->ReleaseStringUTFChars(textString, textChars);
+    qDebug() << "received text:" << sharedText;
+    emit AndroidIntentReceiver::instance().textReceived(sharedText);
+}
 
 #endif

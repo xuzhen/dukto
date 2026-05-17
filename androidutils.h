@@ -1,7 +1,7 @@
 #ifndef ANDROIDUTILS_H
 #define ANDROIDUTILS_H
 
-#include <QtGlobal>
+#include <QObject>
 
 #ifdef Q_OS_ANDROID
 
@@ -223,5 +223,22 @@ public:
     static void openDetailsPage();
 };
 
+/*============================================================*/
+
+class AndroidIntentReceiver : public QObject
+{
+    Q_OBJECT
+public:
+    Q_DISABLE_COPY(AndroidIntentReceiver)
+    static AndroidIntentReceiver& instance();
+
+signals:
+    void fileReceived(QString file);
+    void filesReceived(QStringList files);
+    void textReceived(QString text);
+
+private:
+    explicit AndroidIntentReceiver(QObject *parent = nullptr);
+};
 
 #endif // ANDROIDUTILS_H

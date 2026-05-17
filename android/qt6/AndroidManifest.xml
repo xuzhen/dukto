@@ -29,7 +29,7 @@
         android:label="-- %%INSERT_APP_NAME%% --"
         android:icon="@drawable/icon">
         <activity
-            android:name="org.qtproject.qt.android.bindings.QtActivity"
+            android:name="com.github.xuzhen.dukto.MainActivity"
             android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density"
             android:label="-- %%INSERT_APP_NAME%% --"
             android:launchMode="singleInstance"
@@ -38,6 +38,13 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+                <data android:mimeType="*/*" />
             </intent-filter>
             <!-- Application arguments -->
 

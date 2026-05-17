@@ -210,15 +210,16 @@ android {
 
     greaterThan(QT_MAJOR_VERSION, 5) {
         ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android/qt6
-        OTHER_FILES += $$PWD/android/qt6/AndroidManifest.xml
-        OTHER_FILES += $$PWD/android/qt6/src/com/github/xuzhen/dukto/NotificationHelper.java
-        OTHER_FILES += $$PWD/android/qt6/src/com/github/xuzhen/dukto/NightModeHelper.java
     } else {
         ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android/qt5
-        OTHER_FILES += $$PWD/android/qt5/AndroidManifest.xml
-        OTHER_FILES += $$PWD/android/qt5/src/com/github/xuzhen/dukto/NotificationHelper.java
-        OTHER_FILES += $$PWD/android/qt5/src/com/github/xuzhen/dukto/NightModeHelper.java
     }
+    OTHER_FILES += $$ANDROID_PACKAGE_SOURCE_DIR/AndroidManifest.xml
+    OTHER_FILES += $$ANDROID_PACKAGE_SOURCE_DIR/build.gradle
+    OTHER_FILES += $$ANDROID_PACKAGE_SOURCE_DIR/gradle.properties
+    OTHER_FILES += $$ANDROID_PACKAGE_SOURCE_DIR/src/com/github/xuzhen/dukto/MainActivity.java
+    OTHER_FILES += $$ANDROID_PACKAGE_SOURCE_DIR/src/com/github/xuzhen/dukto/NotificationHelper.java
+    OTHER_FILES += $$ANDROID_PACKAGE_SOURCE_DIR/src/com/github/xuzhen/dukto/NightModeHelper.java
+
     SOURCES += androidutils.cpp
     HEADERS += androidutils.h
 }
