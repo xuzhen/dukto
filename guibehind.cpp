@@ -138,6 +138,9 @@ GuiBehind::~GuiBehind()
     if (mPeriodicHelloTimer) mPeriodicHelloTimer->deleteLater();
     if (mDestBuddy) mDestBuddy->deleteLater();
     if (mNotifier) mNotifier->deleteLater();
+#ifdef Q_OS_ANDROID
+    delete mWakeLock;
+#endif
 }
 
 void GuiBehind::setViewer(DuktoWindow *view) {
