@@ -31,6 +31,9 @@ The `dukto_*_qt6.apk` supports Android 8.0 (Oreo) and later.
 
 The `dukto_*_qt5.apk` supports Android 6.0 (Marshmallow) and later.
 
+#### iOS
+Currently, this project does not support compilation for iOS. Users on iPhone can use [Dukto Link](https://apps.apple.com/mk/app/dukto-link/id6797087331), an app developed by [Gorjan Shukov](https://github.com/sukov), as a compatible alternative.
+
 #### Ubuntu and derivatives:
 Use [this PPA](https://launchpad.net/~xuzhen666/+archive/ubuntu/dukto) 
 
